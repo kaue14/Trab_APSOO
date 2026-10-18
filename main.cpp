@@ -21,7 +21,7 @@ int main() {
         return 0;
     }
 
-    std::string sql = "SELECT codigo, descricao, valor FROM catalogo_itens LIMIT 5;";
+    std::string sql = "SELECT codigo, descricao, valor FROM catalogo_itens";
     status = sqlite3_exec(db, sql.c_str(), callback_impressao, 0, &mensagemErro);
 
     if(status != SQLITE_OK) {
