@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cicatrizar System — Acesso</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+  <!-- Tela de Login — UC001 (RF001) Autenticar usuário -->
+  <div class="janela">
+    <div class="barra-titulo">
+      <img src="img/logo-branca.png" alt="">
+      <span>Cicatrizar System — Acesso</span>
+      <div class="controles" aria-hidden="true">
+        <span>&#x2013;</span><span>&#x25A1;</span><span>&#x2715;</span>
+      </div>
+    </div>
+
+    <main class="login">
+      <section class="marca">
+        <div class="marca-conteudo">
+          <img src="img/logo-branca.png" alt="Logo Cicatrizar: estetoscópio em forma de coração com flores">
+          <h1>Cicatrizar System</h1>
+          <div class="detalhe"></div>
+          <p>Registro de procedimentos e materiais dos atendimentos em home care.</p>
+        </div>
+        <p class="rodape-versao">Versão 1.0</p>
+      </section>
+
+      <section class="acesso">
+        <h2>Acesso ao sistema</h2>
+        <div class="detalhe"></div>
+        <p class="instrucao">Informe seu login ou CPF e sua senha para entrar.</p>
+
+        <form id="form-login" novalidate>
+          <p class="alerta" id="alerta" role="alert" hidden></p>
+
+          <div class="campo">
+            <label for="login">Login ou CPF</label>
+            <input id="login" name="login" type="text" autocomplete="username"
+                   placeholder="ex.: maria.souza ou 000.000.000-00"
+                   aria-describedby="login-erro" autofocus>
+            <p class="campo-erro" id="login-erro" hidden>Informe seu login ou CPF.</p>
+          </div>
+
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <div class="campo-senha">
+              <input id="senha" name="senha" type="password" autocomplete="current-password"
+                     aria-describedby="senha-erro">
+              <button type="button" class="mostrar-senha" id="mostrar-senha" aria-pressed="false">Mostrar</button>
+            </div>
+            <p class="campo-erro" id="senha-erro" hidden>Informe sua senha.</p>
+          </div>
+
+          <button type="submit" class="botao botao-primario" id="entrar">Entrar</button>
+        </form>
+
+        <p class="nota">Acesso restrito a profissionais cadastrados. Com problemas para entrar? Procure o Administrador do sistema.</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Só existe no protótipo: escolhe qual resposta o "sistema" dá ao clicar em Entrar -->
+  <div class="prototipo-painel" role="radiogroup" aria-label="Resposta simulada do sistema">
+    <strong>Protótipo — resposta simulada:</strong>
+    <label><input type="radio" name="resposta" value="liberado" checked> Acesso liberado</label>
+    <label><input type="radio" name="resposta" value="incorreto"> Login/senha incorretos (1.1)</label>
+    <label><input type="radio" name="resposta" value="falha"> Falha ao consultar dados (3.1)</label>
+  </div>
+
+  <script>
+    const form = document.getElementById('form-login');
+    const alerta = document.getElementById('alerta');
+    const botaoEntrar = document.getElementById('entrar');
+    const botaoMostrar = document.getElementById('mostrar-senha');
+    const campos = [
+      { input: document.getElementById('login'), erro: document.getElementById('login-erro') },
+      { input: document.getElementById('senha'), erro: document.getElementById('senha-erro') },
+    ];
+
+    const mensagens = {
+      liberado: ['sucesso', 'Acesso liberado. Carregando as funcionalidades do seu perfil…'],
+      incorreto: ['erro', 'Login/CPF ou senha incorretos. Verifique os dados e tente novamente.'],
+      falha: ['erro', 'Não foi possível concluir o acesso. Houve uma falha ao consultar os dados do usuário; tente novamente em instantes.'],
+    };
+
+    function mostrarAlerta(tipo, texto) {
+      alerta.className = 'alerta alerta-' + tipo;
+      alerta.textContent = texto;
+      alerta.hidden = false;
+    }
+
+    function marcarCampo({ input, erro }, invalido) {
+      input.setAttribute('aria-invalid', invalido);
+      erro.hidden = !invalido;
+    }
+
+    // 2.1 — campo obrigatório vazio
+    function validar() {
+      let primeiroVazio = null;
+      for (const campo of campos) {
+        const vazio = campo.input.value.trim() === '';
+        marcarCampo(campo, vazio);
+        if (vazio && !primeiroVazio) primeiroVazio = campo.input;
+      }
+      if (primeiroVazio) primeiroVazio.focus();
+      return !primeiroVazio;
+    }
+
+    campos.forEach((campo) => {
+      campo.input.addEventListener('input', () => {
+        if (campo.input.value.trim() !== '') marcarCampo(campo, false);
+      });
+    });
+
+    botaoMostrar.addEventListener('click', () => {
+      const senha = campos[1].input;
+      const visivel = senha.type === 'text';
+      senha.type = visivel ? 'password' : 'text';
+      botaoMostrar.textContent = visivel ? 'Mostrar' : 'Ocultar';
+      botaoMostrar.setAttribute('aria-pressed', !visivel);
+      senha.focus();
+    });
+
+    form.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      alerta.hidden = true;
+      if (!validar()) return;
+
+      botaoEntrar.disabled = true;
+      botaoEntrar.textContent = 'Entrando…';
+
+      setTimeout(() => {
+        const resposta = document.querySelector('input[name="resposta"]:checked').value;
+        const [tipo, texto] = mensagens[resposta];
+        mostrarAlerta(tipo, texto);
+        botaoEntrar.disabled = false;
+        botaoEntrar.textContent = 'Entrar';
+
+        // 1.1 — permite nova tentativa: limpa a senha e volta o foco para ela
+        if (resposta === 'incorreto') {
+          campos[1].input.value = '';
+          campos[1].input.focus();
+        }
+      }, 600);
+    });
+  </script>
+</body>
+</html>

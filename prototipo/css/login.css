@@ -1,0 +1,146 @@
+/* Tela de Login — UC001 / RF001 */
+
+.login {
+  display: grid;
+  grid-template-columns: 5fr 6fr;
+  min-height: 600px;
+}
+
+/* Lado da marca */
+.marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 32px 20px;
+  background: linear-gradient(160deg, var(--ciano) 0%, var(--ciano-escuro) 100%);
+  color: var(--branco);
+  text-align: center;
+}
+
+.marca-conteudo {
+  margin: auto 0;
+}
+
+.marca img {
+  width: 220px;
+  max-width: 70%;
+  height: auto;
+}
+
+.marca h1 {
+  margin: 24px 0 0;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.marca .detalhe {
+  width: 48px;
+  height: 4px;
+  margin: 12px auto;
+  border-radius: 2px;
+  background: var(--rosa);
+}
+
+.marca p {
+  max-width: 300px;
+  margin: 0;
+  color: rgb(255 255 255 / 0.88);
+}
+
+/* Lado do formulário */
+.acesso {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px clamp(24px, 7vw, 88px);
+}
+
+.acesso h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.acesso .detalhe {
+  width: 36px;
+  height: 4px;
+  margin: 10px 0 12px;
+  border-radius: 2px;
+  background: var(--rosa);
+}
+
+.acesso .instrucao {
+  margin: 0 0 24px;
+  color: var(--texto-suave);
+}
+
+.acesso form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.campo-senha {
+  position: relative;
+}
+
+.campo-senha input {
+  padding-right: 84px;
+}
+
+.mostrar-senha {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--ciano-escuro);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mostrar-senha:hover {
+  background: var(--ciano-suave);
+}
+
+.acesso .botao-primario {
+  margin-top: 4px;
+}
+
+.acesso .nota {
+  margin: 28px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid #e3ecee;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.rodape-versao {
+  margin: 24px 0 0;
+  font-size: 12px;
+  color: rgb(255 255 255 / 0.7);
+}
+
+@media (max-width: 760px) {
+  .login {
+    grid-template-columns: 1fr;
+  }
+
+  .marca {
+    padding: 28px 24px;
+  }
+
+  .marca img {
+    width: 120px;
+  }
+
+  .rodape-versao {
+    display: none;
+  }
+}

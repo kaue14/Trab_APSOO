@@ -1,0 +1,213 @@
+/* Cicatrizar System — estilo compartilhado entre as telas do protótipo */
+
+:root {
+  /* Paleta */
+  --ciano: #0097b2;          /* fundo da logo */
+  --ciano-escuro: #007a91;
+  --ciano-profundo: #005f71;
+  --ciano-claro: #55b9d8;    /* traço da logo */
+  --ciano-suave: #e6f5f8;
+  --branco: #ffffff;
+  --rosa: #ec8faa;           /* terceira cor — provisória, ainda em decisão */
+
+  /* Texto e estrutura */
+  --texto: #17323a;
+  --texto-suave: #5a7078;
+  --borda: #c9dbe0;
+  --fundo-area: #dcebef;
+
+  /* Mensagens */
+  --erro: #b3261e;
+  --erro-fundo: #fdecea;
+  --sucesso: #1e7b4f;
+  --sucesso-fundo: #e5f4ec;
+
+  --raio: 8px;
+  --fonte: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: var(--fundo-area);
+  color: var(--texto);
+  font-family: var(--fonte);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Janela do aplicativo desktop (simulada) */
+.janela {
+  width: min(1040px, 100%);
+  background: var(--branco);
+  border-radius: var(--raio);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgb(0 60 75 / 0.12), 0 12px 32px rgb(0 60 75 / 0.18);
+}
+
+.barra-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding-left: 12px;
+  background: var(--ciano-profundo);
+  color: var(--branco);
+  font-size: 13px;
+  user-select: none;
+}
+
+.barra-titulo img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.barra-titulo .controles {
+  display: flex;
+  margin-left: auto;
+  height: 100%;
+}
+
+.barra-titulo .controles span {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* Campos de formulário */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.campo input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--branco);
+  color: var(--texto);
+  font: inherit;
+}
+
+.campo input::placeholder {
+  color: #93a6ac;
+}
+
+.campo input:focus {
+  outline: none;
+  border-color: var(--ciano);
+  box-shadow: 0 0 0 3px rgb(0 151 178 / 0.2);
+}
+
+.campo input[aria-invalid="true"] {
+  border-color: var(--erro);
+}
+
+.campo input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgb(179 38 30 / 0.15);
+}
+
+.campo-erro {
+  margin: 0;
+  color: var(--erro);
+  font-size: 13px;
+}
+
+/* Botões */
+.botao {
+  height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--raio);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botao-primario {
+  background: var(--ciano);
+  color: var(--branco);
+}
+
+.botao-primario:hover {
+  background: var(--ciano-escuro);
+}
+
+.botao-primario:focus-visible {
+  outline: 3px solid rgb(0 151 178 / 0.35);
+  outline-offset: 2px;
+}
+
+.botao-primario:disabled {
+  background: var(--ciano-claro);
+  cursor: progress;
+}
+
+/* Mensagens do sistema */
+.alerta {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 4px solid;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.alerta-erro {
+  border-color: var(--erro);
+  background: var(--erro-fundo);
+  color: var(--erro);
+}
+
+.alerta-sucesso {
+  border-color: var(--sucesso);
+  background: var(--sucesso-fundo);
+  color: var(--sucesso);
+}
+
+/* Painel fora da janela, só para simular respostas do sistema no protótipo */
+.prototipo-painel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  width: min(1040px, 100%);
+  padding: 10px 14px;
+  border: 1px dashed #9bb5bc;
+  border-radius: var(--raio);
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.prototipo-painel strong {
+  color: var(--texto);
+}
+
+.prototipo-painel label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
