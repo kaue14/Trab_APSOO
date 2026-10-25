@@ -1,0 +1,191 @@
+/* Estrutura das telas internas: menu lateral + cabeçalho + conteúdo */
+
+.app {
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  min-height: 620px;
+}
+
+/* Menu lateral */
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 12px;
+  background: linear-gradient(180deg, var(--ciano) 0%, var(--ciano-escuro) 100%);
+  color: var(--branco);
+}
+
+.menu-marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 0 8px 16px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.2);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.menu-marca img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.menu-grupo {
+  margin-top: 14px;
+}
+
+.menu-grupo h3 {
+  margin: 0 0 4px;
+  padding: 0 10px;
+  color: rgb(255 255 255 / 0.7);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.menu a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--branco);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
+.menu a:focus-visible {
+  outline: 2px solid var(--branco);
+  outline-offset: -2px;
+}
+
+/* Item da tela atual: fundo claro + marcador na terceira cor */
+.menu a[aria-current="page"] {
+  background: rgb(255 255 255 / 0.18);
+  font-weight: 600;
+}
+
+.menu a[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: -12px;
+  width: 4px;
+  border-radius: 0 2px 2px 0;
+  background: var(--rosa);
+}
+
+.menu-rodape {
+  margin: auto 0 0;
+  padding: 16px 10px 0;
+  color: rgb(255 255 255 / 0.7);
+  font-size: 12px;
+}
+
+/* Área principal */
+.principal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #f4f9fa;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+  padding: 0 24px;
+  border-bottom: 1px solid #e3ecee;
+  background: var(--branco);
+}
+
+.cabecalho h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--ciano-suave);
+  color: var(--ciano-profundo);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.usuario-nome {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.usuario-perfil {
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+.usuario .botao-secundario {
+  margin-left: 8px;
+}
+
+.conteudo {
+  flex: 1;
+  padding: 28px 24px;
+}
+
+/* Aviso rápido no rodapé da área principal */
+.aviso {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  margin: 0;
+  padding: 10px 16px;
+  transform: translateX(-50%);
+  border-radius: var(--raio);
+  background: var(--texto);
+  color: var(--branco);
+  font-size: 14px;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgb(0 40 50 / 0.25);
+}
+
+@media (max-width: 760px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-rodape {
+    display: none;
+  }
+
+  .usuario > div {
+    display: none;
+  }
+
+  .aviso {
+    white-space: normal;
+    width: calc(100% - 32px);
+  }
+}

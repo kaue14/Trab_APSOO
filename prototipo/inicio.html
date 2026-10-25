@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cicatrizar System — Início</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/inicio.css">
+</head>
+<body>
+  <!-- Tela inicial — UC001 (passo 4): apresenta as funcionalidades permitidas para o perfil -->
+
+  <!-- Ícones usados na tela -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-paciente-novo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/></symbol>
+    <symbol id="i-procedimento" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3H9z"/><path d="M9 11h6M9 15h4"/></symbol>
+    <symbol id="i-material" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></symbol>
+    <symbol id="i-fechamento" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+    <symbol id="i-usuarios" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 21a6.5 6.5 0 0 0-2.5-5.1"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-config" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="m15 8 4 4-4 4M19 12H9"/></symbol>
+  </svg>
+
+  <div class="janela">
+    <div class="barra-titulo">
+      <img src="img/logo-branca.png" alt="">
+      <span>Cicatrizar System — Início</span>
+      <div class="controles" aria-hidden="true">
+        <span>&#x2013;</span><span>&#x25A1;</span><span>&#x2715;</span>
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- data-perfis: quais perfis enxergam o item (técnico, enfermeiro, administrador) -->
+      <nav class="menu" aria-label="Menu principal">
+        <div class="menu-marca">
+          <img src="img/logo-branca.png" alt="">
+          <span>Cicatrizar System</span>
+        </div>
+
+        <a href="inicio.html" aria-current="page"><svg class="icone"><use href="#i-inicio"/></svg>Início</a>
+
+        <div class="menu-grupo">
+          <h3>Pacientes</h3>
+          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-busca"/></svg>Buscar paciente</a>
+          <a href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-paciente-novo"/></svg>Cadastrar paciente</a>
+        </div>
+
+        <div class="menu-grupo">
+          <h3>Atendimentos</h3>
+          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+          <a href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+        </div>
+
+        <div class="menu-grupo" data-perfis="administrador">
+          <h3>Administração</h3>
+          <a href="#"><svg class="icone"><use href="#i-usuarios"/></svg>Usuários</a>
+          <a href="#"><svg class="icone"><use href="#i-log"/></svg>Log de atividades</a>
+          <a href="#"><svg class="icone"><use href="#i-config"/></svg>Configurações</a>
+        </div>
+
+        <p class="menu-rodape">Versão 1.0</p>
+      </nav>
+
+      <div class="principal">
+        <header class="cabecalho">
+          <h1>Início</h1>
+          <div class="usuario">
+            <span class="avatar" aria-hidden="true">TF</span>
+            <div>
+              <div class="usuario-nome">Thiago Fernandes</div>
+              <div class="usuario-perfil" id="perfil-nome"></div>
+            </div>
+            <!-- UC003 — Encerrar sessão -->
+            <a class="botao botao-secundario" id="sair" href="login.html?sessao=encerrada"><svg class="icone"><use href="#i-sair"/></svg>Sair</a>
+          </div>
+        </header>
+
+        <main class="conteudo">
+          <section class="saudacao">
+            <h2 id="saudacao">Olá, Thiago</h2>
+            <div class="detalhe"></div>
+            <p class="data" id="data-hoje"></p>
+            <p id="perfil-descricao"></p>
+          </section>
+
+          <h3 class="secao-titulo">Acesso rápido</h3>
+          <div class="atalhos">
+            <a class="atalho" href="#" data-perfis="tecnico enfermeiro administrador">
+              <span class="atalho-icone"><svg class="icone"><use href="#i-busca"/></svg></span>
+              <strong>Buscar paciente</strong>
+              <span class="atalho-descricao">Pesquise por nome ou número de identificação.</span>
+            </a>
+            <a class="atalho" href="#" data-perfis="tecnico enfermeiro administrador">
+              <span class="atalho-icone"><svg class="icone"><use href="#i-procedimento"/></svg></span>
+              <strong>Registrar procedimento</strong>
+              <span class="atalho-descricao">Data, procedimento e profissional executante.</span>
+            </a>
+            <a class="atalho" href="#" data-perfis="tecnico enfermeiro administrador">
+              <span class="atalho-icone"><svg class="icone"><use href="#i-material"/></svg></span>
+              <strong>Registrar material</strong>
+              <span class="atalho-descricao">Material utilizado, data e quantidade.</span>
+            </a>
+            <a class="atalho" href="#" data-perfis="enfermeiro administrador">
+              <span class="atalho-icone"><svg class="icone"><use href="#i-paciente-novo"/></svg></span>
+              <strong>Cadastrar paciente</strong>
+              <span class="atalho-descricao">Dados básicos de um novo paciente.</span>
+            </a>
+            <a class="atalho" href="#" data-perfis="enfermeiro administrador">
+              <span class="atalho-icone"><svg class="icone"><use href="#i-fechamento"/></svg></span>
+              <strong>Fechamento mensal</strong>
+              <span class="atalho-descricao">Procedimentos e materiais do paciente no mês.</span>
+            </a>
+          </div>
+        </main>
+
+        <p class="aviso" id="aviso" role="status" hidden></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Só existe no protótipo: escolhe qual perfil está logado para ver o menu de cada um -->
+  <div class="prototipo-painel" role="radiogroup" aria-label="Perfil simulado">
+    <strong>Protótipo — ver como:</strong>
+    <label><input type="radio" name="perfil" value="tecnico"> Técnico de Enfermagem</label>
+    <label><input type="radio" name="perfil" value="enfermeiro"> Enfermeiro</label>
+    <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
+  </div>
+
+  <script>
+    const PERFIS = {
+      tecnico: {
+        nome: 'Técnico de Enfermagem',
+        descricao: 'Você pode buscar pacientes e registrar os procedimentos e materiais dos atendimentos.',
+      },
+      enfermeiro: {
+        nome: 'Enfermeiro',
+        descricao: 'Além do registro dos atendimentos, você pode cadastrar pacientes e consultar o fechamento mensal.',
+      },
+      administrador: {
+        nome: 'Administrador',
+        descricao: 'Você tem acesso a todas as funções, incluindo usuários, log de atividades e configurações.',
+      },
+    };
+
+    // Mostra só o que o perfil pode acessar (UC001, passo 4)
+    function aplicarPerfil(perfil) {
+      document.querySelectorAll('[data-perfis]').forEach((elemento) => {
+        elemento.hidden = !elemento.dataset.perfis.split(' ').includes(perfil);
+      });
+      document.getElementById('perfil-nome').textContent = PERFIS[perfil].nome;
+      document.getElementById('perfil-descricao').textContent = PERFIS[perfil].descricao;
+      try {
+        sessionStorage.setItem('perfil', perfil);
+      } catch {}
+    }
+
+    let perfilAtual = 'tecnico';
+    try {
+      perfilAtual = sessionStorage.getItem('perfil') || perfilAtual;
+    } catch {}
+    document.querySelector(`input[name="perfil"][value="${perfilAtual}"]`).checked = true;
+    aplicarPerfil(perfilAtual);
+
+    document.querySelectorAll('input[name="perfil"]').forEach((opcao) => {
+      opcao.addEventListener('change', () => aplicarPerfil(opcao.value));
+    });
+
+    // Saudação e data de hoje
+    const agora = new Date();
+    const hora = agora.getHours();
+    const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+    document.getElementById('saudacao').textContent = `${saudacao}, Thiago`;
+    document.getElementById('data-hoje').textContent = agora.toLocaleDateString('pt-BR', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+
+    // Telas que ainda não existem no protótipo
+    const aviso = document.getElementById('aviso');
+    let temporizadorAviso;
+    document.querySelectorAll('.janela a[href="#"]').forEach((link) => {
+      link.addEventListener('click', (evento) => {
+        evento.preventDefault();
+        const nome = (link.querySelector('strong') || link).textContent.trim();
+        aviso.textContent = `A tela “${nome}” será desenhada nas próximas etapas.`;
+        aviso.hidden = false;
+        clearTimeout(temporizadorAviso);
+        temporizadorAviso = setTimeout(() => { aviso.hidden = true; }, 2500);
+      });
+    });
+
+    // UC003 — Encerrar sessão: invalida a sessão e volta para o login
+    document.getElementById('sair').addEventListener('click', () => {
+      try {
+        sessionStorage.removeItem('perfil');
+      } catch {}
+    });
+  </script>
+</body>
+</html>

@@ -40,7 +40,7 @@
           <div class="campo">
             <label for="login">Login ou CPF</label>
             <input id="login" name="login" type="text" autocomplete="username"
-                   placeholder="ex.: maria.souza ou 000.000.000-00"
+                   placeholder="ex.: thiago.fernandes ou 000.000.000-00"
                    aria-describedby="login-erro" autofocus>
             <p class="campo-erro" id="login-erro" hidden>Informe seu login ou CPF.</p>
           </div>
@@ -145,8 +145,18 @@
           campos[1].input.value = '';
           campos[1].input.focus();
         }
+
+        // Cenário principal (4) — inicia a sessão e abre a tela inicial
+        if (resposta === 'liberado') {
+          setTimeout(() => { location.href = 'inicio.html'; }, 800);
+        }
       }, 600);
     });
+
+    // Volta do "Sair" da tela inicial (UC003)
+    if (new URLSearchParams(location.search).get('sessao') === 'encerrada') {
+      mostrarAlerta('sucesso', 'Sessão encerrada. Até a próxima!');
+    }
   </script>
 </body>
 </html>

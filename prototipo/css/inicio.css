@@ -1,0 +1,92 @@
+/* Tela inicial — apresenta as funcionalidades do perfil (UC001, passo 4) */
+
+.saudacao h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.saudacao .detalhe {
+  width: 36px;
+  height: 4px;
+  margin: 10px 0 12px;
+  border-radius: 2px;
+  background: var(--rosa);
+}
+
+.saudacao p {
+  margin: 0;
+  color: var(--texto-suave);
+}
+
+.saudacao .data {
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.saudacao .data::first-letter {
+  text-transform: uppercase;
+}
+
+.secao-titulo {
+  margin: 28px 0 12px;
+  color: var(--texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.atalhos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.atalho {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  border: 1px solid #e0eaed;
+  border-radius: 10px;
+  background: var(--branco);
+  color: var(--texto);
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.atalho:hover {
+  border-color: var(--ciano-claro);
+  box-shadow: 0 4px 14px rgb(0 95 113 / 0.1);
+}
+
+.atalho:focus-visible {
+  outline: 3px solid rgb(0 151 178 / 0.35);
+  outline-offset: 2px;
+}
+
+.atalho-icone {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: var(--ciano-suave);
+  color: var(--ciano-escuro);
+}
+
+.atalho-icone .icone {
+  width: 22px;
+  height: 22px;
+}
+
+.atalho strong {
+  font-size: 15px;
+}
+
+.atalho-descricao {
+  color: var(--texto-suave);
+  font-size: 13px;
+}

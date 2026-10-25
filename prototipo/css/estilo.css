@@ -32,6 +32,11 @@
   box-sizing: border-box;
 }
 
+/* Garante que elementos escondidos por perfil fiquem ocultos mesmo com display definido */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -164,6 +169,40 @@ body {
 .botao-primario:disabled {
   background: var(--ciano-claro);
   cursor: progress;
+}
+
+.botao-secundario {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  color: var(--ciano-escuro);
+  text-decoration: none;
+}
+
+.botao-secundario:hover {
+  border-color: var(--ciano-claro);
+  background: var(--ciano-suave);
+}
+
+.botao-secundario:focus-visible {
+  outline: 3px solid rgb(0 151 178 / 0.35);
+  outline-offset: 2px;
+}
+
+/* Ícones de linha, definidos como <symbol> no próprio HTML de cada tela */
+.icone {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* Mensagens do sistema */
