@@ -101,12 +101,19 @@ body {
   gap: 6px;
 }
 
-.campo label {
+.campo label,
+.campo .rotulo {
   font-weight: 600;
   font-size: 14px;
 }
 
-.campo input {
+/* Asterisco de campo obrigatório */
+.obrigatorio {
+  color: var(--erro);
+}
+
+.campo input,
+.campo select {
   width: 100%;
   height: 42px;
   padding: 0 12px;
@@ -121,17 +128,20 @@ body {
   color: #93a6ac;
 }
 
-.campo input:focus {
+.campo input:focus,
+.campo select:focus {
   outline: none;
   border-color: var(--ciano);
   box-shadow: 0 0 0 3px rgb(0 151 178 / 0.2);
 }
 
-.campo input[aria-invalid="true"] {
+.campo input[aria-invalid="true"],
+.campo select[aria-invalid="true"] {
   border-color: var(--erro);
 }
 
-.campo input[aria-invalid="true"]:focus {
+.campo input[aria-invalid="true"]:focus,
+.campo select[aria-invalid="true"]:focus {
   box-shadow: 0 0 0 3px rgb(179 38 30 / 0.15);
 }
 
@@ -143,12 +153,17 @@ body {
 
 /* Botões */
 .botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   height: 44px;
   padding: 0 20px;
   border: none;
   border-radius: var(--raio);
   font: inherit;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -172,15 +187,11 @@ body {
 }
 
 .botao-secundario {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   height: 36px;
   padding: 0 14px;
   border: 1px solid var(--borda);
   background: var(--branco);
   color: var(--ciano-escuro);
-  text-decoration: none;
 }
 
 .botao-secundario:hover {

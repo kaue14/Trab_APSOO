@@ -155,6 +155,56 @@
   padding: 28px 24px;
 }
 
+/* Caixa branca para agrupar partes da tela */
+.cartao {
+  border: 1px solid #e0eaed;
+  border-radius: 10px;
+  background: var(--branco);
+}
+
+/* Descrição da tela + botão de ação principal à direita */
+.pagina-topo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.pagina-topo p {
+  margin: 0;
+  color: var(--texto-suave);
+}
+
+.pagina-topo .botao {
+  margin-left: auto;
+}
+
+/* Mensagem no lugar do conteúdo: lista vazia, acesso bloqueado, registro não encontrado */
+.vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 40px 16px;
+  color: var(--texto-suave);
+  text-align: center;
+}
+
+.vazio > .icone {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 6px;
+  color: var(--ciano-claro);
+}
+
+.vazio strong {
+  color: var(--texto);
+}
+
+.vazio .botao {
+  margin-top: 12px;
+}
+
 /* Aviso rápido no rodapé da área principal */
 .aviso {
   position: absolute;

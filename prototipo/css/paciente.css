@@ -1,0 +1,110 @@
+/* Cadastrar / Editar paciente — UC006 (RF006) e UC008 (RF008) */
+
+.formulario {
+  padding: 22px;
+}
+
+.formulario .alerta {
+  margin-bottom: 18px;
+}
+
+.secao-form + .secao-form {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e3ecee;
+}
+
+.secao-form h2 {
+  margin: 0 0 14px;
+  color: var(--texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Grade de 6 colunas: cada campo diz quantas ocupa */
+.grade {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+.col-1 { grid-column: span 1; }
+.col-2 { grid-column: span 2; }
+.col-3 { grid-column: span 3; }
+.col-4 { grid-column: span 4; }
+
+/* Escolha CPF / Carteira */
+.segmentado {
+  display: flex;
+  height: 42px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+
+.segmentado label {
+  position: relative;
+  flex: 1;
+  font-weight: 400;
+}
+
+.segmentado input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.segmentado span {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  cursor: pointer;
+}
+
+.segmentado label + label span {
+  border-left: 1px solid var(--borda);
+}
+
+.segmentado input:checked + span {
+  background: var(--ciano);
+  color: var(--branco);
+  font-weight: 600;
+}
+
+.segmentado input:focus-visible + span {
+  outline: 3px solid rgb(0 151 178 / 0.35);
+  outline-offset: -3px;
+}
+
+/* Rodapé com os botões */
+.formulario-rodape {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #e3ecee;
+}
+
+.formulario-rodape .nota {
+  margin: 0 auto 0 0;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.formulario-rodape .botao-secundario {
+  height: 44px;
+  padding: 0 20px;
+}
+
+@media (max-width: 760px) {
+  .col-1,
+  .col-2,
+  .col-3,
+  .col-4 {
+    grid-column: span 6;
+  }
+}

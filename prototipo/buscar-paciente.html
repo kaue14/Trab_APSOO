@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cicatrizar System — Buscar paciente</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/buscar-paciente.css">
+</head>
+<body>
+  <!-- Buscar paciente — UC007 (RF007) -->
+
+  <!-- Ícones usados na tela -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-paciente-novo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/></symbol>
+    <symbol id="i-procedimento" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3H9z"/><path d="M9 11h6M9 15h4"/></symbol>
+    <symbol id="i-material" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></symbol>
+    <symbol id="i-fechamento" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+    <symbol id="i-usuarios" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 21a6.5 6.5 0 0 0-2.5-5.1"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-config" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="m15 8 4 4-4 4M19 12H9"/></symbol>
+    <symbol id="i-editar" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+  </svg>
+
+  <div class="janela">
+    <div class="barra-titulo">
+      <img src="img/logo-branca.png" alt="">
+      <span>Cicatrizar System — Buscar paciente</span>
+      <div class="controles" aria-hidden="true">
+        <span>&#x2013;</span><span>&#x25A1;</span><span>&#x2715;</span>
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- data-perfis: quais perfis enxergam o item (técnico, enfermeiro, administrador) -->
+      <nav class="menu" aria-label="Menu principal">
+        <div class="menu-marca">
+          <img src="img/logo-branca.png" alt="">
+          <span>Cicatrizar System</span>
+        </div>
+
+        <a href="inicio.html"><svg class="icone"><use href="#i-inicio"/></svg>Início</a>
+
+        <div class="menu-grupo">
+          <h3>Pacientes</h3>
+          <a href="buscar-paciente.html" aria-current="page" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-busca"/></svg>Buscar paciente</a>
+          <a href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-paciente-novo"/></svg>Cadastrar paciente</a>
+        </div>
+
+        <div class="menu-grupo">
+          <h3>Atendimentos</h3>
+          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+          <a href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+        </div>
+
+        <div class="menu-grupo" data-perfis="administrador">
+          <h3>Administração</h3>
+          <a href="#"><svg class="icone"><use href="#i-usuarios"/></svg>Usuários</a>
+          <a href="#"><svg class="icone"><use href="#i-log"/></svg>Log de atividades</a>
+          <a href="#"><svg class="icone"><use href="#i-config"/></svg>Configurações</a>
+        </div>
+
+        <p class="menu-rodape">Versão 1.0</p>
+      </nav>
+
+      <div class="principal">
+        <header class="cabecalho">
+          <h1>Buscar paciente</h1>
+          <div class="usuario">
+            <span class="avatar" aria-hidden="true">TF</span>
+            <div>
+              <div class="usuario-nome">Thiago Fernandes</div>
+              <div class="usuario-perfil" id="perfil-nome"></div>
+            </div>
+            <!-- UC003 — Encerrar sessão -->
+            <a class="botao botao-secundario" id="sair" href="login.html?sessao=encerrada"><svg class="icone"><use href="#i-sair"/></svg>Sair</a>
+          </div>
+        </header>
+
+        <main class="conteudo">
+          <div class="pagina-topo">
+            <p>Pesquise pelo nome ou pelo número de identificação (CPF ou carteira).</p>
+            <a class="botao botao-secundario" href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-paciente-novo"/></svg>Cadastrar paciente</a>
+          </div>
+
+          <!-- Passos 2 e 3: informa o critério e solicita a pesquisa -->
+          <form class="cartao busca" id="form-busca" role="search" novalidate>
+            <div class="campo">
+              <label for="termo">Nome, CPF ou nº da carteira</label>
+              <div class="busca-linha">
+                <input id="termo" name="termo" type="search" autocomplete="off"
+                       placeholder="ex.: Silva ou 318.452.907-14"
+                       aria-describedby="termo-erro" autofocus>
+                <button type="submit" class="botao botao-primario"><svg class="icone"><use href="#i-busca"/></svg>Pesquisar</button>
+              </div>
+              <p class="campo-erro" id="termo-erro" hidden>Informe um nome ou número de identificação para pesquisar.</p>
+            </div>
+          </form>
+
+          <section class="resultados" aria-live="polite">
+            <div class="cartao vazio" id="estado-inicial">
+              <svg class="icone"><use href="#i-busca"/></svg>
+              <strong>Nenhuma pesquisa feita ainda</strong>
+              <span>Digite parte do nome ou o número do documento e clique em Pesquisar.</span>
+            </div>
+
+            <!-- 4.1 — nenhum paciente corresponde ao critério -->
+            <div class="cartao vazio" id="sem-resultados" hidden>
+              <svg class="icone"><use href="#i-busca"/></svg>
+              <strong id="sem-resultados-texto"></strong>
+              <span>Confira o nome ou o número informado e tente novamente.</span>
+            </div>
+
+            <!-- Passo 4: pacientes correspondentes -->
+            <div id="lista" hidden>
+              <p class="resultados-contagem" id="contagem"></p>
+
+              <!-- Passo 5: paciente selecionado -->
+              <div class="cartao selecionado" id="selecionado" hidden>
+                <div>
+                  <span class="selecionado-rotulo">Paciente selecionado</span>
+                  <strong id="selecionado-nome"></strong>
+                </div>
+                <div class="acoes">
+                  <a class="botao botao-primario" href="#"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+                  <a class="botao botao-secundario" href="#"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+                  <a class="botao botao-secundario" id="link-editar" href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-editar"/></svg>Editar dados</a>
+                  <a class="botao botao-secundario" href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+                </div>
+              </div>
+
+              <div class="cartao tabela-rolagem">
+                <table class="tabela">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Nascimento</th>
+                      <th>CPF ou carteira</th>
+                      <th>Endereço</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pacientes"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <p class="aviso" id="aviso" role="status" hidden></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Só existe no protótipo: escolhe qual perfil está logado para ver o menu de cada um -->
+  <div class="prototipo-painel" role="radiogroup" aria-label="Perfil simulado">
+    <strong>Protótipo — ver como:</strong>
+    <label><input type="radio" name="perfil" value="tecnico"> Técnico de Enfermagem</label>
+    <label><input type="radio" name="perfil" value="enfermeiro"> Enfermeiro</label>
+    <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/pacientes.js"></script>
+  <script>
+    const PACIENTES = carregarPacientes();
+
+    const form = document.getElementById('form-busca');
+    const termo = document.getElementById('termo');
+    const termoErro = document.getElementById('termo-erro');
+    const estadoInicial = document.getElementById('estado-inicial');
+    const semResultados = document.getElementById('sem-resultados');
+    const lista = document.getElementById('lista');
+    const corpo = document.getElementById('pacientes');
+    const selecionado = document.getElementById('selecionado');
+
+    // Ignora acentos e maiúsculas: "jose" encontra "José"
+    const normalizar = (texto) => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
+    function pesquisar(valor) {
+      const nome = normalizar(valor);
+      const numero = soDigitos(valor);
+      return PACIENTES
+        .filter((paciente) =>
+          normalizar(paciente.nome).includes(nome) ||
+          (numero.length >= 3 && soDigitos(paciente.documento).includes(numero)))
+        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    }
+
+    function formatarData(iso) {
+      const [ano, mes, dia] = iso.split('-');
+      return `${dia}/${mes}/${ano}`;
+    }
+
+    function idade(iso) {
+      const hoje = new Date();
+      const nascimento = new Date(`${iso}T00:00`);
+      const anos = hoje.getFullYear() - nascimento.getFullYear();
+      const aindaNaoFez = hoje.getMonth() < nascimento.getMonth() ||
+        (hoje.getMonth() === nascimento.getMonth() && hoje.getDate() < nascimento.getDate());
+      return aindaNaoFez ? anos - 1 : anos;
+    }
+
+    function celula(principal, secundario, etiqueta) {
+      const td = document.createElement('td');
+      if (etiqueta) {
+        const tag = document.createElement('span');
+        tag.className = 'tipo-doc';
+        tag.textContent = etiqueta;
+        td.append(tag);
+      }
+      td.append(principal);
+      if (secundario) {
+        const detalhe = document.createElement('span');
+        detalhe.className = 'secundario';
+        detalhe.textContent = secundario;
+        td.append(detalhe);
+      }
+      return td;
+    }
+
+    // Passo 5 — o usuário seleciona o paciente desejado
+    function selecionar(linha, paciente) {
+      corpo.querySelectorAll('tr').forEach((tr) => tr.setAttribute('aria-selected', 'false'));
+      linha.setAttribute('aria-selected', 'true');
+      document.getElementById('selecionado-nome').textContent = paciente.nome;
+      document.getElementById('link-editar').href = `paciente.html?id=${paciente.id}`;
+      selecionado.hidden = false;
+    }
+
+    function mostrarResultados(encontrados, valor) {
+      corpo.replaceChildren();
+      selecionado.hidden = true;
+      estadoInicial.hidden = true;
+      semResultados.hidden = encontrados.length > 0;
+      lista.hidden = encontrados.length === 0;
+
+      if (encontrados.length === 0) {
+        document.getElementById('sem-resultados-texto').textContent = `Nenhum paciente encontrado para “${valor}”.`;
+        return;
+      }
+
+      const plural = encontrados.length > 1 ? 's' : '';
+      document.getElementById('contagem').textContent =
+        `${encontrados.length} paciente${plural} encontrado${plural}. Clique em um paciente para selecioná-lo.`;
+
+      encontrados.forEach((paciente) => {
+        const linha = document.createElement('tr');
+        linha.tabIndex = 0;
+        linha.setAttribute('aria-selected', 'false');
+        linha.append(
+          celula(paciente.nome),
+          celula(formatarData(paciente.nascimento), `${idade(paciente.nascimento)} anos`),
+          celula(paciente.documento, null, paciente.tipoDoc),
+          celula(paciente.rua, paciente.bairro),
+        );
+        linha.addEventListener('click', () => selecionar(linha, paciente));
+        linha.addEventListener('keydown', (evento) => {
+          if (evento.key === 'Enter' || evento.key === ' ') {
+            evento.preventDefault();
+            selecionar(linha, paciente);
+          }
+        });
+        corpo.append(linha);
+      });
+    }
+
+    form.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      const valor = termo.value.trim();
+
+      // 2.1 — sem critério de busca
+      const vazio = valor === '';
+      termo.setAttribute('aria-invalid', vazio);
+      termoErro.hidden = !vazio;
+      if (vazio) {
+        termo.focus();
+        return;
+      }
+
+      mostrarResultados(pesquisar(valor), valor);
+    });
+
+    termo.addEventListener('input', () => {
+      if (termo.value.trim() !== '') {
+        termo.setAttribute('aria-invalid', false);
+        termoErro.hidden = true;
+      }
+    });
+  </script>
+</body>
+</html>
