@@ -1,2 +1,5 @@
 # Configuração local do Claude (usada só para abrir o protótipo no navegador do app)
 .claude/
+
+# Executáveis gerados na compilação
+*.exe

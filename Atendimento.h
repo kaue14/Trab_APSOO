@@ -11,15 +11,17 @@ private:
     int paciente_id;
     int profissional_id;
     std::string data_atendimento;
+    int registrado_por;            // RF012: quem lançou o atendimento (Técnico só edita os seus)
     std::vector<AtendimentoItem> itens;
 
 public:
     // Construtor vazio
-    Atendimento() : id(0), paciente_id(0), profissional_id(0), data_atendimento("") {}
+    Atendimento() : id(0), paciente_id(0), profissional_id(0), data_atendimento(""), registrado_por(0) {}
 
     // Construtor
     Atendimento(int id, int paciente_id, int profissional_id, std::string data_atendimento)
-        : id(id), paciente_id(paciente_id), profissional_id(profissional_id), data_atendimento(data_atendimento) {}
+        : id(id), paciente_id(paciente_id), profissional_id(profissional_id), data_atendimento(data_atendimento),
+          registrado_por(0) {}
 
     // Adiciona um procedimento ou material (RF009 / RF010)
     void adicionarItem(int catalogo_id, int quantidade) {
@@ -43,11 +45,14 @@ public:
     int getPacienteId() const { return paciente_id; }
     int getProfissionalId() const { return profissional_id; }
     std::string getDataAtendimento() const { return data_atendimento; }
+    // Sem registro explícito, quem registrou é o próprio profissional executante
+    int getRegistradoPor() const { return registrado_por != 0 ? registrado_por : profissional_id; }
     const std::vector<AtendimentoItem>& getItens() const { return itens; }
 
     // Set
     void setId(int novoId) { id = novoId; }
     void setDataAtendimento(const std::string& novaData) { data_atendimento = novaData; }
+    void setRegistradoPor(int idProfissional) { registrado_por = idProfissional; }
 };
 
 #endif

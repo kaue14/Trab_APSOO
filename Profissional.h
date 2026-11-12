@@ -9,6 +9,9 @@ private:
     std::string nome;
     std::string registro_conselho;
     std::string nivel_acesso;      // "Tecnico", "Enfermeiro" ou "Administrador"
+    std::string login;             // RF001/RF002: entra com o login ou o CPF
+    std::string cpf;
+    std::string senha_hash;        // NF004: só o hash SHA-256 da senha, nunca a senha
 
 public:
     // Construtor vazio
@@ -27,6 +30,9 @@ public:
     std::string getNome() const { return nome; }
     std::string getRegistroConselho() const { return registro_conselho; }
     std::string getNivelAcesso() const { return nivel_acesso; }
+    std::string getLogin() const { return login; }
+    std::string getCpf() const { return cpf; }
+    std::string getSenhaHash() const { return senha_hash; }
 
     // Set
     void setId(int novoId) { id = novoId; }
@@ -36,6 +42,9 @@ public:
             nivel_acesso = novoNivel;
         }
     }
+    void setLogin(const std::string& novoLogin) { login = novoLogin; }
+    void setCpf(const std::string& novoCpf) { cpf = novoCpf; }
+    void setSenhaHash(const std::string& novoHash) { senha_hash = novoHash; }
 
     // Checa nivel de acesso
     bool isEnfermeiroOuSuperior() const {
