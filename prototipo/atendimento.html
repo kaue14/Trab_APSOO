@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cicatrizar System — Registrar atendimento</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/formulario.css">
+  <link rel="stylesheet" href="css/atendimento.css">
+</head>
+<body>
+  <!-- Registrar atendimento — UC009 Registrar procedimento, UC010 Registrar material
+       e UC012 Editar procedimento registrado. atendimento.html?paciente=2#materiais -->
+
+  <!-- Ícones usados na tela -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-paciente-novo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/></symbol>
+    <symbol id="i-procedimento" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3H9z"/><path d="M9 11h6M9 15h4"/></symbol>
+    <symbol id="i-material" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></symbol>
+    <symbol id="i-fechamento" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+    <symbol id="i-usuarios" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 21a6.5 6.5 0 0 0-2.5-5.1"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-config" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="m15 8 4 4-4 4M19 12H9"/></symbol>
+    <symbol id="i-editar" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+    <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-remover" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  </svg>
+
+  <div class="janela">
+    <div class="barra-titulo">
+      <img src="img/logo-branca.png" alt="">
+      <span>Cicatrizar System — Registrar atendimento</span>
+      <div class="controles" aria-hidden="true">
+        <span>&#x2013;</span><span>&#x25A1;</span><span>&#x2715;</span>
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- data-perfis: quais perfis enxergam o item (técnico, enfermeiro, administrador) -->
+      <nav class="menu" aria-label="Menu principal">
+        <div class="menu-marca">
+          <img src="img/logo-branca.png" alt="">
+          <span>Cicatrizar System</span>
+        </div>
+
+        <a href="inicio.html"><svg class="icone"><use href="#i-inicio"/></svg>Início</a>
+
+        <div class="menu-grupo">
+          <h3>Pacientes</h3>
+          <a href="buscar-paciente.html" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-busca"/></svg>Buscar paciente</a>
+          <a href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-paciente-novo"/></svg>Cadastrar paciente</a>
+        </div>
+
+        <div class="menu-grupo">
+          <h3>Atendimentos</h3>
+          <a href="atendimento.html#procedimentos" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+          <a href="atendimento.html#materiais" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+          <a href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+        </div>
+
+        <div class="menu-grupo" data-perfis="administrador">
+          <h3>Administração</h3>
+          <a href="#"><svg class="icone"><use href="#i-usuarios"/></svg>Usuários</a>
+          <a href="#"><svg class="icone"><use href="#i-log"/></svg>Log de atividades</a>
+          <a href="#"><svg class="icone"><use href="#i-config"/></svg>Configurações</a>
+        </div>
+
+        <p class="menu-rodape">Versão 1.0</p>
+      </nav>
+
+      <div class="principal">
+        <header class="cabecalho">
+          <h1>Registrar atendimento</h1>
+          <div class="usuario">
+            <span class="avatar" aria-hidden="true">TF</span>
+            <div>
+              <div class="usuario-nome">Thiago Fernandes</div>
+              <div class="usuario-perfil" id="perfil-nome"></div>
+            </div>
+            <!-- UC003 — Encerrar sessão -->
+            <a class="botao botao-secundario" id="sair" href="login.html?sessao=encerrada"><svg class="icone"><use href="#i-sair"/></svg>Sair</a>
+          </div>
+        </header>
+
+        <main class="conteudo">
+          <!-- 1.1 — nenhum paciente selecionado -->
+          <div class="cartao vazio" id="sem-paciente" hidden>
+            <svg class="icone"><use href="#i-busca"/></svg>
+            <strong>Nenhum paciente selecionado</strong>
+            <span>Para registrar procedimentos e materiais, primeiro busque e selecione o paciente atendido.</span>
+            <a class="botao botao-primario" href="buscar-paciente.html"><svg class="icone"><use href="#i-busca"/></svg>Buscar paciente</a>
+          </div>
+
+          <div id="com-paciente" hidden>
+            <!-- Passo 1: paciente atendido -->
+            <div class="cartao paciente-resumo">
+              <span class="avatar" id="paciente-iniciais" aria-hidden="true"></span>
+              <div>
+                <span class="rotulo-pequeno">Paciente atendido</span>
+                <strong id="paciente-nome"></strong>
+                <span class="detalhes" id="paciente-detalhes"></span>
+              </div>
+              <a class="botao botao-secundario" href="buscar-paciente.html"><svg class="icone"><use href="#i-busca"/></svg>Trocar paciente</a>
+            </div>
+
+            <form class="cartao formulario" id="form-atendimento" novalidate>
+              <p class="alerta" id="alerta" role="alert" hidden></p>
+
+              <!-- UC012 — modo edição de um atendimento já registrado -->
+              <div class="edicao-aviso" id="edicao-aviso" hidden>
+                <svg class="icone"><use href="#i-editar"/></svg>
+                <span id="edicao-texto"></span>
+              </div>
+
+              <section class="secao-form">
+                <h2>Dados do atendimento</h2>
+                <div class="grade">
+                  <div class="campo col-2">
+                    <label for="data">Data <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <input id="data" name="data" type="text" inputmode="numeric" maxlength="10"
+                           placeholder="dd/mm/aaaa" required aria-describedby="data-erro">
+                    <p class="campo-erro" id="data-erro" hidden></p>
+                  </div>
+                  <div class="campo col-4">
+                    <label for="profissional">Profissional executante <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <select id="profissional" name="profissional" required aria-describedby="profissional-erro"></select>
+                    <p class="campo-erro" id="profissional-erro" hidden></p>
+                  </div>
+                </div>
+              </section>
+
+              <!-- UC009 — procedimentos realizados -->
+              <section class="secao-form" id="procedimentos">
+                <h2>Procedimentos</h2>
+                <div class="grade inclusao">
+                  <div class="campo col-4">
+                    <label for="procedimento-item">Código ou nome do procedimento</label>
+                    <input id="procedimento-item" type="text" list="lista-procedimentos" autocomplete="off"
+                           placeholder="ex.: 88040020 ou curativo" aria-describedby="procedimento-erro">
+                  </div>
+                  <div class="campo col-1">
+                    <label for="procedimento-qtd">Qtde.</label>
+                    <input id="procedimento-qtd" type="number" min="1" step="1" value="1">
+                  </div>
+                  <div class="col-1">
+                    <button type="button" class="botao botao-secundario" id="procedimento-adicionar"><svg class="icone"><use href="#i-mais"/></svg>Adicionar</button>
+                  </div>
+                </div>
+                <p class="campo-erro" id="procedimento-erro" hidden></p>
+                <p class="lista-vazia" id="procedimento-vazio">Nenhum procedimento adicionado.</p>
+                <div class="cartao tabela-rolagem itens" id="procedimento-tabela" hidden>
+                  <table class="tabela">
+                    <thead>
+                      <tr><th class="col-codigo">Código</th><th>Descrição</th><th class="col-qtd">Qtde.</th><th class="col-acao"></th></tr>
+                    </thead>
+                    <tbody id="procedimento-lista"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <!-- UC010 — materiais utilizados -->
+              <section class="secao-form" id="materiais">
+                <h2>Materiais utilizados</h2>
+                <div class="grade inclusao">
+                  <div class="campo col-4">
+                    <label for="material-item">Nome ou código do material</label>
+                    <input id="material-item" type="text" list="lista-materiais" autocomplete="off"
+                           placeholder="ex.: gaze ou 0071000417" aria-describedby="material-erro">
+                  </div>
+                  <div class="campo col-1">
+                    <label for="material-qtd">Qtde.</label>
+                    <input id="material-qtd" type="number" min="1" step="1" value="1">
+                  </div>
+                  <div class="col-1">
+                    <button type="button" class="botao botao-secundario" id="material-adicionar"><svg class="icone"><use href="#i-mais"/></svg>Adicionar</button>
+                  </div>
+                </div>
+                <p class="campo-erro" id="material-erro" hidden></p>
+                <p class="lista-vazia" id="material-vazio">Nenhum material adicionado.</p>
+                <div class="cartao tabela-rolagem itens" id="material-tabela" hidden>
+                  <table class="tabela">
+                    <thead>
+                      <tr><th class="col-codigo">Código</th><th>Descrição</th><th class="col-qtd">Qtde.</th><th class="col-acao"></th></tr>
+                    </thead>
+                    <tbody id="material-lista"></tbody>
+                  </table>
+                </div>
+              </section>
+
+              <p class="alerta alerta-erro itens-erro" id="itens-erro" hidden>Adicione pelo menos um procedimento ou material ao atendimento.</p>
+
+              <div class="formulario-rodape">
+                <p class="nota"><span class="obrigatorio">*</span> Campos obrigatórios</p>
+                <button type="button" class="botao botao-secundario" id="limpar">Limpar</button>
+                <button type="submit" class="botao botao-primario" id="salvar">Salvar atendimento</button>
+              </div>
+            </form>
+
+            <!-- UC012 — atendimentos já registrados para o paciente -->
+            <section class="cartao historico">
+              <div class="historico-topo">
+                <h2>Atendimentos registrados</h2>
+                <p>Para corrigir um lançamento, clique em Editar. Técnicos só podem editar os atendimentos que eles mesmos registraram.</p>
+              </div>
+              <p class="lista-vazia" id="historico-vazio" hidden>Nenhum atendimento registrado para este paciente.</p>
+              <div class="tabela-rolagem" id="historico-tabela">
+                <table class="tabela">
+                  <thead>
+                    <tr><th>Data</th><th>Profissional executante</th><th>Itens</th><th>Registrado por</th><th></th></tr>
+                  </thead>
+                  <tbody id="historico-lista"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <datalist id="lista-procedimentos"></datalist>
+          <datalist id="lista-materiais"></datalist>
+        </main>
+
+        <p class="aviso" id="aviso" role="status" hidden></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Só existe no protótipo: escolhe qual perfil está logado para ver o menu de cada um -->
+  <div class="prototipo-painel" role="radiogroup" aria-label="Perfil simulado">
+    <strong>Protótipo — ver como:</strong>
+    <label><input type="radio" name="perfil" value="tecnico"> Técnico de Enfermagem</label>
+    <label><input type="radio" name="perfil" value="enfermeiro"> Enfermeiro</label>
+    <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/formulario.js"></script>
+  <script src="js/pacientes.js"></script>
+  <script src="js/catalogo.js"></script>
+  <script src="js/atendimentos.js"></script>
+  <script>
+    const pacientes = carregarPacientes();
+    const atendimentos = carregarAtendimentos();
+    const paciente = pacientes.find((p) => p.id === Number(new URLSearchParams(location.search).get('paciente')));
+
+    const form = document.getElementById('form-atendimento');
+    const alerta = document.getElementById('alerta');
+    const campoData = document.getElementById('data');
+    const campoProfissional = document.getElementById('profissional');
+    const TIPOS = ['procedimento', 'material'];
+
+    let itens = [];          // itens do atendimento que está sendo lançado: { codigo, quantidade }
+    let editandoId = null;   // id do atendimento em edição (UC012), ou null ao registrar um novo
+
+    const plural = (n, singular, varios) => `${n} ${n === 1 ? singular : varios}`;
+    const nomeDoProfissional = (id) => (id === USUARIO_LOGADO ? 'Você' : buscarProfissional(id).nome);
+
+    // Menu: "Registrar procedimento" e "Registrar material" abrem esta mesma tela em seções diferentes
+    function irParaSecao() {
+      const secao = location.hash === '#materiais' ? 'materiais' : 'procedimentos';
+      document.querySelectorAll('.menu a[href*="atendimento.html"]').forEach((link) => {
+        if (link.getAttribute('href').endsWith(`#${secao}`)) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      // Já posiciona o cursor no campo da seção escolhida
+      if (paciente && location.hash) {
+        document.getElementById(secao).scrollIntoView({ block: 'start' });
+        document.getElementById(secao === 'materiais' ? 'material-item' : 'procedimento-item').focus();
+      }
+    }
+
+    // Listas de escolha a partir da tabela de procedimentos e materiais
+    TIPOS.forEach((tipo) => {
+      const lista = document.getElementById(tipo === 'procedimento' ? 'lista-procedimentos' : 'lista-materiais');
+      CATALOGO.filter((item) => item.tipo === tipo).forEach((item) => {
+        const opcao = document.createElement('option');
+        opcao.value = `${item.codigo} — ${item.descricao}`;
+        lista.append(opcao);
+      });
+    });
+
+    PROFISSIONAIS.forEach((profissional) => {
+      const opcao = document.createElement('option');
+      opcao.value = profissional.id;
+      opcao.textContent = `${profissional.nome}${profissional.id === USUARIO_LOGADO ? ' (você)' : ''} — ${profissional.coren}`;
+      campoProfissional.append(opcao);
+    });
+
+    campoData.addEventListener('input', () => { campoData.value = mascaraData(campoData.value); });
+
+    function mostrarAlerta(tipo, texto) {
+      alerta.className = `alerta alerta-${tipo}`;
+      alerta.textContent = texto;
+      alerta.hidden = false;
+      alerta.scrollIntoView({ block: 'nearest' });
+    }
+
+    function marcarErro(campo, erro, mensagem) {
+      campo.setAttribute('aria-invalid', mensagem !== '');
+      erro.textContent = mensagem;
+      erro.hidden = mensagem === '';
+    }
+
+    // Itens lançados, separados em procedimentos e materiais
+    function renderizarItens() {
+      TIPOS.forEach((tipo) => {
+        const doTipo = itens.filter((item) => buscarItemCatalogo(item.codigo).tipo === tipo);
+        const corpo = document.getElementById(`${tipo}-lista`);
+        corpo.replaceChildren();
+        document.getElementById(`${tipo}-vazio`).hidden = doTipo.length > 0;
+        document.getElementById(`${tipo}-tabela`).hidden = doTipo.length === 0;
+
+        doTipo.forEach((item) => {
+          const dados = buscarItemCatalogo(item.codigo);
+          const linha = document.createElement('tr');
+          [dados.codigo, dados.descricao, item.quantidade].forEach((texto, coluna) => {
+            const td = document.createElement('td');
+            td.textContent = texto;
+            if (coluna === 2) td.className = 'col-qtd';
+            linha.append(td);
+          });
+          const remover = document.createElement('button');
+          remover.type = 'button';
+          remover.className = 'remover';
+          remover.setAttribute('aria-label', `Remover ${dados.descricao}`);
+          remover.innerHTML = '<svg class="icone"><use href="#i-remover"/></svg>';
+          remover.addEventListener('click', () => {
+            itens = itens.filter((outro) => outro !== item);
+            renderizarItens();
+          });
+          const acao = document.createElement('td');
+          acao.append(remover);
+          linha.append(acao);
+          corpo.append(linha);
+        });
+      });
+      if (itens.length > 0) document.getElementById('itens-erro').hidden = true;
+    }
+
+    // Passo 3 (UC009 e UC010): escolhe o item da tabela, informa a quantidade e adiciona
+    TIPOS.forEach((tipo) => {
+      const campoItem = document.getElementById(`${tipo}-item`);
+      const campoQtd = document.getElementById(`${tipo}-qtd`);
+      const erro = document.getElementById(`${tipo}-erro`);
+
+      function adicionar() {
+        const valor = campoItem.value.trim();
+        const codigo = valor.split(' — ')[0].trim();
+        const escolhido = CATALOGO.find((item) => item.tipo === tipo &&
+          (item.codigo === codigo || normalizar(item.descricao) === normalizar(valor)));
+        const quantidade = Number(campoQtd.value);
+
+        // 3.1 — item ou quantidade ausente ou inválido
+        let mensagem = '';
+        if (!valor) mensagem = tipo === 'procedimento' ? 'Informe o código ou o nome do procedimento.' : 'Informe o nome do material.';
+        else if (!escolhido) mensagem = `Escolha um ${tipo} da tabela: digite parte do código ou do nome e selecione na lista.`;
+        marcarErro(campoItem, erro, mensagem);
+        if (mensagem) return campoItem.focus();
+
+        if (!Number.isInteger(quantidade) || quantidade < 1) {
+          marcarErro(campoQtd, erro, 'A quantidade deve ser um número inteiro maior que zero.');
+          return campoQtd.focus();
+        }
+        marcarErro(campoQtd, erro, '');
+
+        const existente = itens.find((item) => item.codigo === escolhido.codigo);
+        if (existente) existente.quantidade += quantidade;
+        else itens.push({ codigo: escolhido.codigo, quantidade });
+
+        campoItem.value = '';
+        campoQtd.value = 1;
+        campoItem.focus();
+        renderizarItens();
+      }
+
+      document.getElementById(`${tipo}-adicionar`).addEventListener('click', adicionar);
+      [campoItem, campoQtd].forEach((campo) => campo.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Enter') {
+          evento.preventDefault();
+          adicionar();
+        }
+      }));
+    });
+
+    // UC012 3.1 — Técnico só edita atendimentos que ele mesmo registrou
+    const podeEditar = (atendimento) => perfilAtual !== 'tecnico' || atendimento.registradoPor === USUARIO_LOGADO;
+
+    function renderizarHistorico() {
+      const doPaciente = atendimentos
+        .filter((atendimento) => atendimento.pacienteId === paciente.id)
+        .sort((a, b) => b.data.localeCompare(a.data) || b.id - a.id);
+      const corpo = document.getElementById('historico-lista');
+      corpo.replaceChildren();
+      document.getElementById('historico-vazio').hidden = doPaciente.length > 0;
+      document.getElementById('historico-tabela').hidden = doPaciente.length === 0;
+
+      doPaciente.forEach((atendimento) => {
+        const doTipo = (tipo) => atendimento.itens.filter((item) => buscarItemCatalogo(item.codigo).tipo === tipo);
+        const procedimentos = doTipo('procedimento');
+        const linha = document.createElement('tr');
+        if (atendimento.id === editandoId) linha.setAttribute('aria-current', 'true');
+
+        const colunas = [
+          [dataParaTela(atendimento.data)],
+          [buscarProfissional(atendimento.profissionalId).nome],
+          [procedimentos.length ? buscarItemCatalogo(procedimentos[0].codigo).descricao : 'Somente materiais',
+            `${plural(procedimentos.length, 'procedimento', 'procedimentos')} · ${plural(doTipo('material').length, 'material', 'materiais')}`],
+          [nomeDoProfissional(atendimento.registradoPor)],
+        ];
+        colunas.forEach(([principal, secundario]) => {
+          const td = document.createElement('td');
+          td.append(principal);
+          if (secundario) {
+            const detalhe = document.createElement('span');
+            detalhe.className = 'secundario';
+            detalhe.textContent = secundario;
+            td.append(detalhe);
+          }
+          linha.append(td);
+        });
+
+        const acao = document.createElement('td');
+        if (podeEditar(atendimento)) {
+          const editar = document.createElement('button');
+          editar.type = 'button';
+          editar.className = 'botao botao-secundario';
+          editar.innerHTML = '<svg class="icone"><use href="#i-editar"/></svg>Editar';
+          editar.addEventListener('click', () => iniciarEdicao(atendimento));
+          acao.append(editar);
+        } else {
+          acao.innerHTML = '<span class="bloqueado"><svg class="icone"><use href="#i-cadeado"/></svg>Outro profissional</span>';
+        }
+        linha.append(acao);
+        corpo.append(linha);
+      });
+    }
+
+    function limparFormulario() {
+      editandoId = null;
+      itens = [];
+      campoData.value = dataParaTela(diasAtras(0));
+      campoProfissional.value = USUARIO_LOGADO;
+      [campoData, campoProfissional].forEach((campo) => campo.setAttribute('aria-invalid', false));
+      form.querySelectorAll('.campo-erro').forEach((erro) => { erro.hidden = true; });
+      document.getElementById('itens-erro').hidden = true;
+      document.getElementById('edicao-aviso').hidden = true;
+      document.getElementById('salvar').textContent = 'Salvar atendimento';
+      document.getElementById('limpar').textContent = 'Limpar';
+      renderizarItens();
+      renderizarHistorico();
+    }
+
+    // UC012 passos 2–4: verifica a permissão e apresenta os dados atuais
+    function iniciarEdicao(atendimento) {
+      if (!podeEditar(atendimento)) {
+        mostrarAlerta('erro', 'Você só pode editar atendimentos registrados por você.');
+        return;
+      }
+      limparFormulario();
+      editandoId = atendimento.id;
+      itens = atendimento.itens.map((item) => ({ ...item }));
+      campoData.value = dataParaTela(atendimento.data);
+      campoProfissional.value = atendimento.profissionalId;
+      document.getElementById('edicao-texto').textContent =
+        `Editando o atendimento de ${dataParaTela(atendimento.data)}. Faça as correções e salve.`;
+      document.getElementById('edicao-aviso').hidden = false;
+      document.getElementById('salvar').textContent = 'Salvar alterações';
+      document.getElementById('limpar').textContent = 'Cancelar edição';
+      alerta.hidden = true;
+      renderizarItens();
+      renderizarHistorico();
+      form.scrollIntoView({ block: 'start' });
+      campoData.focus();
+    }
+
+    document.getElementById('limpar').addEventListener('click', () => {
+      limparFormulario();
+      alerta.hidden = true;
+    });
+
+    form.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+
+      // 3.1 — data ou outro campo obrigatório ausente ou inválido
+      const erroData = validarData(campoData.value.trim(), 'data do atendimento');
+      marcarErro(campoData, document.getElementById('data-erro'), erroData);
+      const erroProfissional = campoProfissional.value ? '' : 'Selecione o profissional executante.';
+      marcarErro(campoProfissional, document.getElementById('profissional-erro'), erroProfissional);
+      document.getElementById('itens-erro').hidden = itens.length > 0;
+
+      if (erroData || erroProfissional || itens.length === 0) {
+        mostrarAlerta('erro', 'Não foi possível salvar. Corrija os pontos destacados.');
+        (erroData ? campoData : erroProfissional ? campoProfissional : document.getElementById('procedimento-item')).focus();
+        return;
+      }
+
+      const dados = {
+        data: dataParaGuardar(campoData.value.trim()),
+        profissionalId: Number(campoProfissional.value),
+        itens: itens.map((item) => ({ ...item })),
+      };
+      const resumo = `${plural(dados.itens.filter((i) => buscarItemCatalogo(i.codigo).tipo === 'procedimento').length, 'procedimento', 'procedimentos')} e ` +
+        `${plural(dados.itens.filter((i) => buscarItemCatalogo(i.codigo).tipo === 'material').length, 'material', 'materiais')}`;
+
+      // Passos 5 e 6: vincula ao paciente e confirma
+      let mensagem;
+      if (editandoId) {
+        Object.assign(atendimentos.find((atendimento) => atendimento.id === editandoId), dados);
+        mensagem = `Atendimento de ${dataParaTela(dados.data)} atualizado com sucesso (${resumo}).`;
+      } else {
+        const id = Math.max(0, ...atendimentos.map((atendimento) => atendimento.id)) + 1;
+        atendimentos.push({ id, pacienteId: paciente.id, registradoPor: USUARIO_LOGADO, ...dados });
+        mensagem = `Atendimento registrado para ${paciente.nome}: ${resumo}.`;
+      }
+      salvarAtendimentos(atendimentos);
+      limparFormulario();
+      mostrarAlerta('sucesso', mensagem);
+    });
+
+    // Ao trocar o perfil no painel, atualiza quem pode editar (e sai da edição se não puder mais)
+    document.addEventListener('perfilalterado', () => {
+      const emEdicao = atendimentos.find((atendimento) => atendimento.id === editandoId);
+      if (emEdicao && !podeEditar(emEdicao)) {
+        limparFormulario();
+        mostrarAviso('A edição foi cancelada: este perfil não pode editar esse atendimento.');
+      } else if (paciente) {
+        renderizarHistorico();
+      }
+    });
+
+    // Monta a tela
+    if (!paciente) {
+      document.getElementById('sem-paciente').hidden = false;   // 1.1
+    } else {
+      document.getElementById('com-paciente').hidden = false;
+      document.getElementById('paciente-nome').textContent = paciente.nome;
+      document.getElementById('paciente-iniciais').textContent =
+        paciente.nome.split(' ').filter((parte) => parte.length > 2).slice(0, 2).map((parte) => parte[0]).join('');
+      document.getElementById('paciente-detalhes').textContent =
+        `${idade(paciente.nascimento)} anos · ${paciente.tipoDoc} ${paciente.documento} · ${paciente.rua} — ${paciente.bairro}`;
+
+      // Mantém o paciente ao trocar de seção pelo menu
+      document.querySelectorAll('.menu a[href*="atendimento.html"]').forEach((link) => {
+        link.href = link.getAttribute('href').replace('atendimento.html', `atendimento.html?paciente=${paciente.id}`);
+      });
+
+      limparFormulario();
+    }
+    // Depois do carregamento, para o navegador não tirar o foco ao rolar até a seção do endereço (#materiais)
+    window.addEventListener('load', irParaSecao);
+    window.addEventListener('hashchange', irParaSecao);
+  </script>
+</body>
+</html>

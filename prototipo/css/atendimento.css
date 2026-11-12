@@ -1,0 +1,160 @@
+/* Registrar atendimento — UC009 (procedimentos), UC010 (materiais) e UC012 (editar procedimento) */
+
+/* Paciente atendido */
+.paciente-resumo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+}
+
+.paciente-resumo .rotulo-pequeno {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+.paciente-resumo strong {
+  font-size: 16px;
+}
+
+.paciente-resumo .detalhes {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.paciente-resumo .botao {
+  flex: none;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Aviso de modo edição, na terceira cor */
+.edicao-aviso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--rosa);
+  border-radius: 4px;
+  background: #fdf0f4;
+  font-size: 14px;
+}
+
+/* Linha para incluir um procedimento ou material */
+.inclusao {
+  align-items: start;
+}
+
+.inclusao .botao {
+  width: 100%;
+  height: 42px;
+  margin-top: 27px;
+}
+
+.itens {
+  margin-top: 12px;
+}
+
+.itens .tabela td {
+  vertical-align: middle;
+}
+
+.itens .col-codigo {
+  width: 120px;
+}
+
+.itens .col-qtd {
+  width: 90px;
+  text-align: right;
+}
+
+.itens .col-acao {
+  width: 48px;
+}
+
+.lista-vazia {
+  margin: 12px 0 0;
+  padding: 14px;
+  border: 1px dashed var(--borda);
+  border-radius: var(--raio);
+  color: var(--texto-suave);
+  font-size: 13px;
+  text-align: center;
+}
+
+.remover {
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.remover:hover {
+  background: var(--erro-fundo);
+  color: var(--erro);
+}
+
+.itens-erro {
+  margin-top: 16px;
+}
+
+/* Histórico de atendimentos do paciente (UC012) */
+.historico {
+  margin-top: 20px;
+}
+
+.historico-topo {
+  padding: 18px 18px 12px;
+}
+
+.historico-topo h2 {
+  margin: 0 0 4px;
+  color: var(--texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.historico-topo p {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.historico .tabela {
+  border-top: 1px solid #e0eaed;
+}
+
+.historico tr[aria-current="true"] {
+  background: #fdf0f4;
+  box-shadow: inset 4px 0 0 var(--rosa);
+}
+
+.historico .botao-secundario {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.bloqueado {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--texto-suave);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.bloqueado .icone {
+  width: 14px;
+  height: 14px;
+}

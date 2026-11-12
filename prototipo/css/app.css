@@ -221,6 +221,61 @@
   box-shadow: 0 6px 20px rgb(0 40 50 / 0.25);
 }
 
+/* Tabelas (lista de pacientes, itens, histórico) */
+.tabela-rolagem {
+  overflow-x: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabela th {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e0eaed;
+  background: #f4f9fa;
+  color: var(--texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.tabela td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #edf3f4;
+  vertical-align: top;
+}
+
+.tabela tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabela td:first-child {
+  font-weight: 600;
+}
+
+.tabela .secundario {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.tipo-doc {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #e8f0f2;
+  color: var(--texto-suave);
+  font-size: 11px;
+  font-weight: 600;
+}
+
 @media (max-width: 760px) {
   .app {
     grid-template-columns: 1fr;

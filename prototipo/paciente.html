@@ -6,7 +6,7 @@
   <title>Cicatrizar System — Cadastrar paciente</title>
   <link rel="stylesheet" href="css/estilo.css">
   <link rel="stylesheet" href="css/app.css">
-  <link rel="stylesheet" href="css/paciente.css">
+  <link rel="stylesheet" href="css/formulario.css">
 </head>
 <body>
   <!-- Cadastrar paciente — UC006 (RF006) | Editar dados do paciente — UC008 (RF008)
@@ -54,8 +54,8 @@
 
         <div class="menu-grupo">
           <h3>Atendimentos</h3>
-          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
-          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+          <a href="atendimento.html#procedimentos" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+          <a href="atendimento.html#materiais" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
           <a href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
         </div>
 
@@ -202,6 +202,7 @@
   </div>
 
   <script src="js/app.js"></script>
+  <script src="js/formulario.js"></script>
   <script src="js/pacientes.js"></script>
   <script>
     const pacientes = carregarPacientes();
@@ -228,12 +229,7 @@
       document.getElementById('cancelar').href = 'buscar-paciente.html';
     }
 
-    // Máscaras: o usuário digita só números e a tela coloca a pontuação
-    function mascaraData(valor) {
-      const d = soDigitos(valor).slice(0, 8);
-      return [d.slice(0, 2), d.slice(2, 4), d.slice(4)].filter(Boolean).join('/');
-    }
-
+    // Máscara do documento: o usuário digita só números e a tela coloca a pontuação
     function mascaraDocumento(valor, tipo) {
       const d = soDigitos(valor);
       if (tipo === 'CPF') {
@@ -260,22 +256,10 @@
     form.querySelectorAll('input[name="tipoDoc"]').forEach((opcao) => opcao.addEventListener('change', ajustarTipoDoc));
 
     // Validação (NF002): cada campo obrigatório devolve a mensagem de erro, ou '' se estiver certo
-    function validarData(valor) {
-      if (!valor) return 'Informe a data de nascimento.';
-      const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(valor);
-      if (!partes) return 'Use o formato dd/mm/aaaa.';
-      const [dia, mes, ano] = partes.slice(1).map(Number);
-      const data = new Date(ano, mes - 1, dia);
-      if (data.getDate() !== dia || data.getMonth() !== mes - 1) return 'Data inválida.';
-      if (data > new Date()) return 'A data de nascimento não pode estar no futuro.';
-      if (ano < 1900) return 'Confira o ano de nascimento.';
-      return '';
-    }
-
     const VALIDACOES = {
       nome: (valor) => !valor ? 'Informe o nome completo.'
         : valor.split(/\s+/).length < 2 ? 'Informe o nome e o sobrenome.' : '',
-      nascimento: validarData,
+      nascimento: (valor) => validarData(valor, 'data de nascimento'),
       documento: (valor) => {
         const cpf = tipoDoc() === 'CPF';
         if (!valor) return cpf ? 'Informe o número do CPF.' : 'Informe o número da carteira.';
@@ -312,10 +296,6 @@
       alerta.hidden = false;
       alerta.scrollIntoView({ block: 'nearest' });
     }
-
-    // Converte entre o formato da tela (dd/mm/aaaa) e o guardado (aaaa-mm-dd)
-    const dataParaTela = (iso) => iso.split('-').reverse().join('/');
-    const dataParaGuardar = (texto) => texto.split('/').reverse().join('-');
 
     function preencher(dados) {
       ['nome', 'documento', 'rua', 'complemento', 'bairro', 'cidade', 'uf'].forEach((id) => {

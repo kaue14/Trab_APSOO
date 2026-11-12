@@ -53,8 +53,8 @@
 
         <div class="menu-grupo">
           <h3>Atendimentos</h3>
-          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
-          <a href="#" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+          <a href="atendimento.html#procedimentos" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+          <a href="atendimento.html#materiais" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
           <a href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
         </div>
 
@@ -127,8 +127,8 @@
                   <strong id="selecionado-nome"></strong>
                 </div>
                 <div class="acoes">
-                  <a class="botao botao-primario" href="#"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
-                  <a class="botao botao-secundario" href="#"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+                  <a class="botao botao-primario" id="link-procedimento" href="atendimento.html#procedimentos"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+                  <a class="botao botao-secundario" id="link-material" href="atendimento.html#materiais"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
                   <a class="botao botao-secundario" id="link-editar" href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-editar"/></svg>Editar dados</a>
                   <a class="botao botao-secundario" href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
                 </div>
@@ -165,6 +165,7 @@
   </div>
 
   <script src="js/app.js"></script>
+  <script src="js/formulario.js"></script>
   <script src="js/pacientes.js"></script>
   <script>
     const PACIENTES = carregarPacientes();
@@ -178,9 +179,6 @@
     const corpo = document.getElementById('pacientes');
     const selecionado = document.getElementById('selecionado');
 
-    // Ignora acentos e maiúsculas: "jose" encontra "José"
-    const normalizar = (texto) => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-
     function pesquisar(valor) {
       const nome = normalizar(valor);
       const numero = soDigitos(valor);
@@ -189,20 +187,6 @@
           normalizar(paciente.nome).includes(nome) ||
           (numero.length >= 3 && soDigitos(paciente.documento).includes(numero)))
         .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-    }
-
-    function formatarData(iso) {
-      const [ano, mes, dia] = iso.split('-');
-      return `${dia}/${mes}/${ano}`;
-    }
-
-    function idade(iso) {
-      const hoje = new Date();
-      const nascimento = new Date(`${iso}T00:00`);
-      const anos = hoje.getFullYear() - nascimento.getFullYear();
-      const aindaNaoFez = hoje.getMonth() < nascimento.getMonth() ||
-        (hoje.getMonth() === nascimento.getMonth() && hoje.getDate() < nascimento.getDate());
-      return aindaNaoFez ? anos - 1 : anos;
     }
 
     function celula(principal, secundario, etiqueta) {
@@ -229,6 +213,8 @@
       linha.setAttribute('aria-selected', 'true');
       document.getElementById('selecionado-nome').textContent = paciente.nome;
       document.getElementById('link-editar').href = `paciente.html?id=${paciente.id}`;
+      document.getElementById('link-procedimento').href = `atendimento.html?paciente=${paciente.id}#procedimentos`;
+      document.getElementById('link-material').href = `atendimento.html?paciente=${paciente.id}#materiais`;
       selecionado.hidden = false;
     }
 
@@ -254,7 +240,7 @@
         linha.setAttribute('aria-selected', 'false');
         linha.append(
           celula(paciente.nome),
-          celula(formatarData(paciente.nascimento), `${idade(paciente.nascimento)} anos`),
+          celula(dataParaTela(paciente.nascimento), `${idade(paciente.nascimento)} anos`),
           celula(paciente.documento, null, paciente.tipoDoc),
           celula(paciente.rua, paciente.bairro),
         );

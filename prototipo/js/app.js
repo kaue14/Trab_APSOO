@@ -17,6 +17,7 @@ const PERFIS = {
 
 // Mostra só o que o perfil pode acessar (UC001, passo 4)
 function aplicarPerfil(perfil) {
+  perfilAtual = perfil;
   document.querySelectorAll('[data-perfis]').forEach((elemento) => {
     elemento.hidden = !elemento.dataset.perfis.split(' ').includes(perfil);
   });
@@ -26,6 +27,8 @@ function aplicarPerfil(perfil) {
   try {
     sessionStorage.setItem('perfil', perfil);
   } catch {}
+  // Avisa a tela, para ela atualizar o que depende do perfil além do data-perfis
+  document.dispatchEvent(new CustomEvent('perfilalterado'));
 }
 
 let perfilAtual = 'tecnico';

@@ -26,4 +26,11 @@ function salvarPacientes(pacientes) {
   } catch {}
 }
 
-const soDigitos = (texto) => texto.replace(/\D/g, '');
+function idade(nascimentoIso) {
+  const hoje = new Date();
+  const nascimento = new Date(`${nascimentoIso}T00:00`);
+  const anos = hoje.getFullYear() - nascimento.getFullYear();
+  const aindaNaoFez = hoje.getMonth() < nascimento.getMonth() ||
+    (hoje.getMonth() === nascimento.getMonth() && hoje.getDate() < nascimento.getDate());
+  return aindaNaoFez ? anos - 1 : anos;
+}
