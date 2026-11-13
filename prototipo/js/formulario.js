@@ -24,6 +24,12 @@ function validarData(valor, nomeDoCampo) {
   return '';
 }
 
+// Data de hoje no formato guardado (aaaa-mm-dd)
+function hojeIso() {
+  const hoje = new Date();
+  return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+}
+
 // Converte entre o formato da tela (dd/mm/aaaa) e o guardado (aaaa-mm-dd)
 const dataParaTela = (iso) => iso.split('-').reverse().join('/');
 const dataParaGuardar = (texto) => texto.split('/').reverse().join('-');

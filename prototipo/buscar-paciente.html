@@ -164,12 +164,12 @@
     <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
   </div>
 
-  <script src="js/app.js"></script>
+  <script src="js/modo.js"></script>
   <script src="js/formulario.js"></script>
   <script src="js/pacientes.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
   <script>
-    const PACIENTES = carregarPacientes();
-
     const form = document.getElementById('form-busca');
     const termo = document.getElementById('termo');
     const termoErro = document.getElementById('termo-erro');
@@ -178,16 +178,6 @@
     const lista = document.getElementById('lista');
     const corpo = document.getElementById('pacientes');
     const selecionado = document.getElementById('selecionado');
-
-    function pesquisar(valor) {
-      const nome = normalizar(valor);
-      const numero = soDigitos(valor);
-      return PACIENTES
-        .filter((paciente) =>
-          normalizar(paciente.nome).includes(nome) ||
-          (numero.length >= 3 && soDigitos(paciente.documento).includes(numero)))
-        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-    }
 
     function celula(principal, secundario, etiqueta) {
       const td = document.createElement('td');
@@ -240,7 +230,9 @@
         linha.setAttribute('aria-selected', 'false');
         linha.append(
           celula(paciente.nome),
-          celula(dataParaTela(paciente.nascimento), `${idade(paciente.nascimento)} anos`),
+          paciente.nascimento
+            ? celula(dataParaTela(paciente.nascimento), `${idade(paciente.nascimento)} anos`)
+            : celula('—'),
           celula(paciente.documento, null, paciente.tipoDoc),
           celula(paciente.rua, paciente.bairro),
         );
@@ -255,7 +247,7 @@
       });
     }
 
-    form.addEventListener('submit', (evento) => {
+    form.addEventListener('submit', async (evento) => {
       evento.preventDefault();
       const valor = termo.value.trim();
 
@@ -268,7 +260,12 @@
         return;
       }
 
-      mostrarResultados(pesquisar(valor), valor);
+      // Passo 4 — no sistema, a pesquisa é feita pelo servidor no banco
+      try {
+        mostrarResultados(await Dados.buscarPacientes(valor), valor);
+      } catch (erro) {
+        mostrarAviso(erro.message);
+      }
     });
 
     termo.addEventListener('input', () => {

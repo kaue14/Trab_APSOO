@@ -221,6 +221,19 @@ int main(int argc, char* argv[]) {
         res.set_redirect("/login.html");
     });
 
+    // As telas perguntam por js/modo.js: aberto pelo servidor, passam a usar a API em vez dos dados fictícios
+    servidor.set_pre_routing_handler([](const httplib::Request& req, httplib::Response& res) {
+        if (req.path != "/js/modo.js") return httplib::Server::HandlerResponse::Unhandled;
+        res.set_header("Cache-Control", "no-cache");
+        res.set_content("const MODO_API = true;\n", "text/javascript; charset=utf-8");
+        return httplib::Server::HandlerResponse::Handled;
+    });
+
+    // O navegador sempre confere se as telas mudaram (sem isso, mostra versões antigas guardadas)
+    servidor.set_file_request_handler([](const httplib::Request&, httplib::Response& res) {
+        res.set_header("Cache-Control", "no-cache");
+    });
+
     // JSON malformado ou com tipos errados vira erro 400 com mensagem, em vez de derrubar o pedido
     servidor.set_exception_handler([](const httplib::Request&, httplib::Response& res, std::exception_ptr erro) {
         try {

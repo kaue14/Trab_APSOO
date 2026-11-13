@@ -1,4 +1,5 @@
-// Comportamento comum às telas internas do protótipo (menu por perfil, avisos e Sair)
+// Comportamento comum às telas internas (usuário logado, menu por perfil, avisos e Sair).
+// Precisa de modo.js e dados.js carregados antes.
 
 const PERFIS = {
   tecnico: {
@@ -15,6 +16,9 @@ const PERFIS = {
   },
 };
 
+let perfilAtual = 'tecnico';
+let usuarioAtual = null;   // { id, nome, perfil } de quem está logado
+
 // Mostra só o que o perfil pode acessar (UC001, passo 4)
 function aplicarPerfil(perfil) {
   perfilAtual = perfil;
@@ -24,22 +28,41 @@ function aplicarPerfil(perfil) {
   document.getElementById('perfil-nome').textContent = PERFIS[perfil].nome;
   const descricao = document.getElementById('perfil-descricao');
   if (descricao) descricao.textContent = PERFIS[perfil].descricao;
-  try {
-    sessionStorage.setItem('perfil', perfil);
-  } catch {}
+  if (!MODO_API) {
+    try {
+      sessionStorage.setItem('perfil', perfil);
+    } catch {}
+  }
   // Avisa a tela, para ela atualizar o que depende do perfil além do data-perfis
   document.dispatchEvent(new CustomEvent('perfilalterado'));
 }
 
-let perfilAtual = 'tecnico';
-try {
-  perfilAtual = sessionStorage.getItem('perfil') || perfilAtual;
-} catch {}
-document.querySelector(`input[name="perfil"][value="${perfilAtual}"]`).checked = true;
-aplicarPerfil(perfilAtual);
+const iniciais = (nome) => nome.split(' ').filter((parte) => parte.length > 2).slice(0, 2)
+  .map((parte) => parte[0].toUpperCase()).join('');
+
+// Até saber quem está logado, nada que depende de perfil aparece
+document.querySelectorAll('[data-perfis]').forEach((elemento) => { elemento.hidden = true; });
+
+// As telas esperam por isto (await sessaoPronta) antes de usar o perfil ou o usuário.
+// No sistema, pergunta ao servidor quem está logado; sem sessão, a camada de dados leva para o login.
+const sessaoPronta = (async () => {
+  usuarioAtual = await Dados.usuarioLogado();
+  document.querySelector('.usuario-nome').textContent = usuarioAtual.nome;
+  document.querySelector('.usuario .avatar').textContent = iniciais(usuarioAtual.nome);
+
+  const painel = document.querySelector('.prototipo-painel');
+  if (MODO_API) painel.hidden = true;   // no sistema o perfil vem do login; o painel é só do protótipo
+  else document.querySelector(`input[name="perfil"][value="${usuarioAtual.perfil}"]`).checked = true;
+
+  aplicarPerfil(usuarioAtual.perfil);
+  return usuarioAtual;
+})();
 
 document.querySelectorAll('input[name="perfil"]').forEach((opcao) => {
-  opcao.addEventListener('change', () => aplicarPerfil(opcao.value));
+  opcao.addEventListener('change', () => {
+    usuarioAtual.perfil = opcao.value;
+    aplicarPerfil(opcao.value);
+  });
 });
 
 // Aviso rápido no rodapé da área principal
@@ -62,9 +85,9 @@ document.querySelectorAll('.janela a[href="#"]').forEach((link) => {
   });
 });
 
-// UC003 — Encerrar sessão: invalida a sessão e volta para o login
-document.getElementById('sair').addEventListener('click', () => {
-  try {
-    sessionStorage.removeItem('perfil');
-  } catch {}
+// UC003 — Encerrar sessão: invalida a sessão (no servidor, no sistema) e volta para o login
+document.getElementById('sair').addEventListener('click', async (evento) => {
+  evento.preventDefault();
+  await Dados.sair();
+  location.href = 'login.html?sessao=encerrada';
 });

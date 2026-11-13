@@ -236,27 +236,34 @@
     <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
   </div>
 
-  <script src="js/app.js"></script>
+  <script src="js/modo.js"></script>
   <script src="js/formulario.js"></script>
   <script src="js/pacientes.js"></script>
   <script src="js/catalogo.js"></script>
   <script src="js/atendimentos.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
   <script>
-    const pacientes = carregarPacientes();
-    const atendimentos = carregarAtendimentos();
-    const paciente = pacientes.find((p) => p.id === Number(new URLSearchParams(location.search).get('paciente')));
-
     const form = document.getElementById('form-atendimento');
     const alerta = document.getElementById('alerta');
     const campoData = document.getElementById('data');
     const campoProfissional = document.getElementById('profissional');
     const TIPOS = ['procedimento', 'material'];
 
+    // Carregados ao montar a tela (do servidor, no sistema; dos dados fictícios, no protótipo)
+    let paciente = null;
+    let catalogo = [];
+    let profissionais = [];
+    let atendimentos = [];   // histórico do paciente
+
     let itens = [];          // itens do atendimento que está sendo lançado: { codigo, quantidade }
     let editandoId = null;   // id do atendimento em edição (UC012), ou null ao registrar um novo
 
+    const itemDoCatalogo = (codigo) => catalogo.find((item) => item.codigo === codigo);
+    const profissionalPorId = (id) => profissionais.find((p) => p.id === id) || { nome: '—', coren: '' };
     const plural = (n, singular, varios) => `${n} ${n === 1 ? singular : varios}`;
-    const nomeDoProfissional = (id) => (id === USUARIO_LOGADO ? 'Você' : buscarProfissional(id).nome);
+    const nomeDoProfissional = (id) => (id === usuarioAtual.id ? 'Você' : profissionalPorId(id).nome);
+    const contarDoTipo = (lista, tipo) => lista.filter((item) => itemDoCatalogo(item.codigo).tipo === tipo).length;
 
     // Menu: "Registrar procedimento" e "Registrar material" abrem esta mesma tela em seções diferentes
     function irParaSecao() {
@@ -272,22 +279,24 @@
       }
     }
 
-    // Listas de escolha a partir da tabela de procedimentos e materiais
-    TIPOS.forEach((tipo) => {
-      const lista = document.getElementById(tipo === 'procedimento' ? 'lista-procedimentos' : 'lista-materiais');
-      CATALOGO.filter((item) => item.tipo === tipo).forEach((item) => {
-        const opcao = document.createElement('option');
-        opcao.value = `${item.codigo} — ${item.descricao}`;
-        lista.append(opcao);
+    // Listas de escolha a partir da tabela de procedimentos e materiais, e dos profissionais
+    function montarListas() {
+      TIPOS.forEach((tipo) => {
+        const lista = document.getElementById(tipo === 'procedimento' ? 'lista-procedimentos' : 'lista-materiais');
+        catalogo.filter((item) => item.tipo === tipo).forEach((item) => {
+          const opcao = document.createElement('option');
+          opcao.value = `${item.codigo} — ${item.descricao}`;
+          lista.append(opcao);
+        });
       });
-    });
 
-    PROFISSIONAIS.forEach((profissional) => {
-      const opcao = document.createElement('option');
-      opcao.value = profissional.id;
-      opcao.textContent = `${profissional.nome}${profissional.id === USUARIO_LOGADO ? ' (você)' : ''} — ${profissional.coren}`;
-      campoProfissional.append(opcao);
-    });
+      profissionais.forEach((profissional) => {
+        const opcao = document.createElement('option');
+        opcao.value = profissional.id;
+        opcao.textContent = `${profissional.nome}${profissional.id === usuarioAtual.id ? ' (você)' : ''} — ${profissional.coren}`;
+        campoProfissional.append(opcao);
+      });
+    }
 
     campoData.addEventListener('input', () => { campoData.value = mascaraData(campoData.value); });
 
@@ -307,14 +316,14 @@
     // Itens lançados, separados em procedimentos e materiais
     function renderizarItens() {
       TIPOS.forEach((tipo) => {
-        const doTipo = itens.filter((item) => buscarItemCatalogo(item.codigo).tipo === tipo);
+        const doTipo = itens.filter((item) => itemDoCatalogo(item.codigo).tipo === tipo);
         const corpo = document.getElementById(`${tipo}-lista`);
         corpo.replaceChildren();
         document.getElementById(`${tipo}-vazio`).hidden = doTipo.length > 0;
         document.getElementById(`${tipo}-tabela`).hidden = doTipo.length === 0;
 
         doTipo.forEach((item) => {
-          const dados = buscarItemCatalogo(item.codigo);
+          const dados = itemDoCatalogo(item.codigo);
           const linha = document.createElement('tr');
           [dados.codigo, dados.descricao, item.quantidade].forEach((texto, coluna) => {
             const td = document.createElement('td');
@@ -349,7 +358,7 @@
       function adicionar() {
         const valor = campoItem.value.trim();
         const codigo = valor.split(' — ')[0].trim();
-        const escolhido = CATALOGO.find((item) => item.tipo === tipo &&
+        const escolhido = catalogo.find((item) => item.tipo === tipo &&
           (item.codigo === codigo || normalizar(item.descricao) === normalizar(valor)));
         const quantidade = Number(campoQtd.value);
 
@@ -385,29 +394,25 @@
       }));
     });
 
-    // UC012 3.1 — Técnico só edita atendimentos que ele mesmo registrou
-    const podeEditar = (atendimento) => perfilAtual !== 'tecnico' || atendimento.registradoPor === USUARIO_LOGADO;
+    // UC012 3.1 — Técnico só edita atendimentos que ele mesmo registrou (no sistema, o servidor confere de novo)
+    const podeEditar = (atendimento) => perfilAtual !== 'tecnico' || atendimento.registradoPor === usuarioAtual.id;
 
     function renderizarHistorico() {
-      const doPaciente = atendimentos
-        .filter((atendimento) => atendimento.pacienteId === paciente.id)
-        .sort((a, b) => b.data.localeCompare(a.data) || b.id - a.id);
       const corpo = document.getElementById('historico-lista');
       corpo.replaceChildren();
-      document.getElementById('historico-vazio').hidden = doPaciente.length > 0;
-      document.getElementById('historico-tabela').hidden = doPaciente.length === 0;
+      document.getElementById('historico-vazio').hidden = atendimentos.length > 0;
+      document.getElementById('historico-tabela').hidden = atendimentos.length === 0;
 
-      doPaciente.forEach((atendimento) => {
-        const doTipo = (tipo) => atendimento.itens.filter((item) => buscarItemCatalogo(item.codigo).tipo === tipo);
-        const procedimentos = doTipo('procedimento');
+      atendimentos.forEach((atendimento) => {
+        const procedimentos = atendimento.itens.filter((item) => itemDoCatalogo(item.codigo).tipo === 'procedimento');
         const linha = document.createElement('tr');
         if (atendimento.id === editandoId) linha.setAttribute('aria-current', 'true');
 
         const colunas = [
           [dataParaTela(atendimento.data)],
-          [buscarProfissional(atendimento.profissionalId).nome],
-          [procedimentos.length ? buscarItemCatalogo(procedimentos[0].codigo).descricao : 'Somente materiais',
-            `${plural(procedimentos.length, 'procedimento', 'procedimentos')} · ${plural(doTipo('material').length, 'material', 'materiais')}`],
+          [profissionalPorId(atendimento.profissionalId).nome],
+          [procedimentos.length ? itemDoCatalogo(procedimentos[0].codigo).descricao : 'Somente materiais',
+            `${plural(procedimentos.length, 'procedimento', 'procedimentos')} · ${plural(contarDoTipo(atendimento.itens, 'material'), 'material', 'materiais')}`],
           [nomeDoProfissional(atendimento.registradoPor)],
         ];
         colunas.forEach(([principal, secundario]) => {
@@ -441,8 +446,8 @@
     function limparFormulario() {
       editandoId = null;
       itens = [];
-      campoData.value = dataParaTela(diasAtras(0));
-      campoProfissional.value = USUARIO_LOGADO;
+      campoData.value = dataParaTela(hojeIso());
+      campoProfissional.value = usuarioAtual.id;
       [campoData, campoProfissional].forEach((campo) => campo.setAttribute('aria-invalid', false));
       form.querySelectorAll('.campo-erro').forEach((erro) => { erro.hidden = true; });
       document.getElementById('itens-erro').hidden = true;
@@ -481,7 +486,7 @@
       alerta.hidden = true;
     });
 
-    form.addEventListener('submit', (evento) => {
+    form.addEventListener('submit', async (evento) => {
       evento.preventDefault();
 
       // 3.1 — data ou outro campo obrigatório ausente ou inválido
@@ -498,60 +503,91 @@
       }
 
       const dados = {
+        pacienteId: paciente.id,
         data: dataParaGuardar(campoData.value.trim()),
         profissionalId: Number(campoProfissional.value),
         itens: itens.map((item) => ({ ...item })),
       };
-      const resumo = `${plural(dados.itens.filter((i) => buscarItemCatalogo(i.codigo).tipo === 'procedimento').length, 'procedimento', 'procedimentos')} e ` +
-        `${plural(dados.itens.filter((i) => buscarItemCatalogo(i.codigo).tipo === 'material').length, 'material', 'materiais')}`;
+      const resumo = `${plural(contarDoTipo(dados.itens, 'procedimento'), 'procedimento', 'procedimentos')} e ` +
+        `${plural(contarDoTipo(dados.itens, 'material'), 'material', 'materiais')}`;
 
-      // Passos 5 e 6: vincula ao paciente e confirma
-      let mensagem;
-      if (editandoId) {
-        Object.assign(atendimentos.find((atendimento) => atendimento.id === editandoId), dados);
-        mensagem = `Atendimento de ${dataParaTela(dados.data)} atualizado com sucesso (${resumo}).`;
-      } else {
-        const id = Math.max(0, ...atendimentos.map((atendimento) => atendimento.id)) + 1;
-        atendimentos.push({ id, pacienteId: paciente.id, registradoPor: USUARIO_LOGADO, ...dados });
-        mensagem = `Atendimento registrado para ${paciente.nome}: ${resumo}.`;
+      // Passos 5 e 6: vincula ao paciente e confirma (5.1 — se não salvar, avisa)
+      const salvar = document.getElementById('salvar');
+      salvar.disabled = true;
+      try {
+        let mensagem;
+        if (editandoId) {
+          await Dados.atualizarAtendimento(editandoId, dados);
+          mensagem = `Atendimento de ${dataParaTela(dados.data)} atualizado com sucesso (${resumo}).`;
+        } else {
+          await Dados.registrarAtendimento(dados);
+          mensagem = `Atendimento registrado para ${paciente.nome}: ${resumo}.`;
+        }
+        atendimentos = await Dados.listarAtendimentos(paciente.id);
+        limparFormulario();
+        mostrarAlerta('sucesso', mensagem);
+      } catch (erro) {
+        mostrarAlerta('erro', erro.message);
+      } finally {
+        salvar.disabled = false;
       }
-      salvarAtendimentos(atendimentos);
-      limparFormulario();
-      mostrarAlerta('sucesso', mensagem);
     });
 
     // Ao trocar o perfil no painel, atualiza quem pode editar (e sai da edição se não puder mais)
     document.addEventListener('perfilalterado', () => {
+      if (!paciente) return;
       const emEdicao = atendimentos.find((atendimento) => atendimento.id === editandoId);
       if (emEdicao && !podeEditar(emEdicao)) {
         limparFormulario();
         mostrarAviso('A edição foi cancelada: este perfil não pode editar esse atendimento.');
-      } else if (paciente) {
+      } else {
         renderizarHistorico();
       }
     });
 
-    // Monta a tela
-    if (!paciente) {
-      document.getElementById('sem-paciente').hidden = false;   // 1.1
-    } else {
-      document.getElementById('com-paciente').hidden = false;
-      document.getElementById('paciente-nome').textContent = paciente.nome;
-      document.getElementById('paciente-iniciais').textContent =
-        paciente.nome.split(' ').filter((parte) => parte.length > 2).slice(0, 2).map((parte) => parte[0]).join('');
-      document.getElementById('paciente-detalhes').textContent =
-        `${idade(paciente.nascimento)} anos · ${paciente.tipoDoc} ${paciente.documento} · ${paciente.rua} — ${paciente.bairro}`;
+    // Monta a tela: paciente, tabela de itens, profissionais e histórico
+    async function montarTela() {
+      await sessaoPronta;
+      const id = new URLSearchParams(location.search).get('paciente');
+      try {
+        paciente = id ? await Dados.obterPaciente(id) : null;
+        if (paciente) {
+          [catalogo, profissionais, atendimentos] = await Promise.all([
+            Dados.listarCatalogo(), Dados.listarProfissionais(), Dados.listarAtendimentos(paciente.id),
+          ]);
+        }
+      } catch (erro) {
+        mostrarAviso(erro.message);
+        paciente = null;
+      }
 
-      // Mantém o paciente ao trocar de seção pelo menu
-      document.querySelectorAll('.menu a[href*="atendimento.html"]').forEach((link) => {
-        link.href = link.getAttribute('href').replace('atendimento.html', `atendimento.html?paciente=${paciente.id}`);
-      });
+      if (!paciente) {
+        document.getElementById('sem-paciente').hidden = false;   // 1.1
+      } else {
+        document.getElementById('com-paciente').hidden = false;
+        document.getElementById('paciente-nome').textContent = paciente.nome;
+        document.getElementById('paciente-iniciais').textContent = iniciais(paciente.nome);
+        const nascimento = paciente.nascimento ? `${idade(paciente.nascimento)} anos · ` : '';
+        const endereco = paciente.rua ? ` · ${paciente.rua} — ${paciente.bairro}` : '';
+        document.getElementById('paciente-detalhes').textContent =
+          `${nascimento}${paciente.tipoDoc} ${paciente.documento}${endereco}`;
 
-      limparFormulario();
+        // Mantém o paciente ao trocar de seção pelo menu
+        document.querySelectorAll('.menu a[href*="atendimento.html"]').forEach((link) => {
+          link.href = link.getAttribute('href').replace('atendimento.html', `atendimento.html?paciente=${paciente.id}`);
+        });
+
+        montarListas();
+        limparFormulario();
+      }
+
+      // Depois do carregamento, para o navegador não tirar o foco ao rolar até a seção do endereço (#materiais)
+      if (document.readyState !== 'complete') await new Promise((pronto) => window.addEventListener('load', pronto, { once: true }));
+      irParaSecao();
     }
-    // Depois do carregamento, para o navegador não tirar o foco ao rolar até a seção do endereço (#materiais)
-    window.addEventListener('load', irParaSecao);
+
     window.addEventListener('hashchange', irParaSecao);
+    montarTela();
   </script>
 </body>
 </html>

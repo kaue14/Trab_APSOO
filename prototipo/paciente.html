@@ -201,11 +201,12 @@
     <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
   </div>
 
-  <script src="js/app.js"></script>
+  <script src="js/modo.js"></script>
   <script src="js/formulario.js"></script>
   <script src="js/pacientes.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
   <script>
-    const pacientes = carregarPacientes();
     const form = document.getElementById('form-paciente');
     const alerta = document.getElementById('alerta');
     const campoDocumento = document.getElementById('documento');
@@ -214,7 +215,7 @@
     // Modo da tela: sem ?id= é cadastro (UC006); com ?id= é edição (UC008)
     const parametros = new URLSearchParams(location.search);
     const editando = parametros.has('id');
-    const paciente = editando ? pacientes.find((p) => p.id === Number(parametros.get('id'))) : null;
+    let paciente = null;   // na edição, os dados atuais (carregados ao montar a tela)
 
     const titulo = editando ? 'Editar paciente' : 'Cadastrar paciente';
     document.title = `Cicatrizar System — ${titulo}`;
@@ -322,16 +323,21 @@
     }
 
     // UC008 1.2 — paciente não encontrado; senão, apresenta os dados atuais (passo 3)
-    if (editando && !paciente) {
+    async function montarTela() {
+      await sessaoPronta;
+      if (!editando) return ajustarTipoDoc();
+      try {
+        paciente = await Dados.obterPaciente(parametros.get('id'));
+      } catch (erro) {
+        return mostrarAlerta('erro', erro.message);
+      }
+      if (paciente) return preencher(paciente);
       form.hidden = true;
       document.getElementById('nao-encontrado').hidden = false;
-    } else if (paciente) {
-      preencher(paciente);
-    } else {
-      ajustarTipoDoc();
     }
+    montarTela();
 
-    form.addEventListener('submit', (evento) => {
+    form.addEventListener('submit', async (evento) => {
       evento.preventDefault();
 
       // UC006 2.1 / UC008 5.1 — campos obrigatórios vazios ou inválidos
@@ -343,20 +349,25 @@
       }
 
       const dados = lerFormulario();
-      if (editando) {
-        Object.assign(paciente, dados);
-        salvarPacientes(pacientes);
-        mostrarAlerta('sucesso', `Dados de ${dados.nome} atualizados com sucesso.`);
-      } else {
-        const id = Math.max(0, ...pacientes.map((p) => p.id)) + 1;
-        pacientes.push({ id, ...dados });
-        salvarPacientes(pacientes);
-        form.reset();
-        ajustarTipoDoc();
-        mostrarAlerta('sucesso', `Paciente ${dados.nome} cadastrado com sucesso. Você já pode encontrá-lo na busca.`);
-        document.getElementById('nome').focus();
+      const salvar = document.getElementById('salvar');
+      salvar.disabled = true;
+      try {
+        if (editando) {
+          paciente = await Dados.atualizarPaciente(paciente.id, dados);
+          mostrarAlerta('sucesso', `Dados de ${dados.nome} atualizados com sucesso.`);
+        } else {
+          await Dados.cadastrarPaciente(dados);
+          form.reset();
+          ajustarTipoDoc();
+          mostrarAlerta('sucesso', `Paciente ${dados.nome} cadastrado com sucesso. Você já pode encontrá-lo na busca.`);
+          document.getElementById('nome').focus();
+        }
+        document.getElementById('cancelar').textContent = 'Voltar';
+      } catch (erro) {
+        mostrarAlerta('erro', erro.message);   // ex.: CPF ou carteira já cadastrados, recusado pelo servidor
+      } finally {
+        salvar.disabled = false;
       }
-      document.getElementById('cancelar').textContent = 'Voltar';
     });
   </script>
 </body>

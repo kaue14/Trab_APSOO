@@ -137,15 +137,19 @@
     <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
   </div>
 
+  <script src="js/modo.js"></script>
+  <script src="js/dados.js"></script>
   <script src="js/app.js"></script>
   <script>
-    // Saudação e data de hoje
+    // Saudação com o primeiro nome de quem entrou, e a data de hoje
     const agora = new Date();
     const hora = agora.getHours();
     const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
-    document.getElementById('saudacao').textContent = `${saudacao}, Thiago`;
     document.getElementById('data-hoje').textContent = agora.toLocaleDateString('pt-BR', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+    sessaoPronta.then((usuario) => {
+      document.getElementById('saudacao').textContent = `${saudacao}, ${usuario.nome.split(' ')[0]}`;
     });
   </script>
 </body>

@@ -71,6 +71,8 @@
     <label><input type="radio" name="resposta" value="falha"> Falha ao consultar dados (3.1)</label>
   </div>
 
+  <script src="js/modo.js"></script>
+  <script src="js/dados.js"></script>
   <script>
     const form = document.getElementById('form-login');
     const alerta = document.getElementById('alerta');
@@ -125,6 +127,26 @@
       senha.focus();
     });
 
+    // 1.1 — permite nova tentativa: limpa a senha e volta o foco para ela
+    function novaTentativa() {
+      campos[1].input.value = '';
+      campos[1].input.focus();
+    }
+
+    // No sistema: confere login e senha no servidor e inicia a sessão
+    async function entrarNoSistema() {
+      try {
+        await Dados.entrar(campos[0].input.value.trim(), campos[1].input.value);
+        mostrarAlerta('sucesso', 'Acesso liberado. Carregando as funcionalidades do seu perfil…');
+        location.href = 'inicio.html';   // cenário principal (4)
+      } catch (erro) {
+        mostrarAlerta('erro', erro.message);   // 1.1 (senha errada) ou 3.1 (falha no sistema)
+        botaoEntrar.disabled = false;
+        botaoEntrar.textContent = 'Entrar';
+        if (erro.status === 401) novaTentativa();
+      }
+    }
+
     form.addEventListener('submit', (evento) => {
       evento.preventDefault();
       alerta.hidden = true;
@@ -132,7 +154,9 @@
 
       botaoEntrar.disabled = true;
       botaoEntrar.textContent = 'Entrando…';
+      if (MODO_API) return entrarNoSistema();
 
+      // No protótipo: a resposta vem do painel "resposta simulada"
       setTimeout(() => {
         const resposta = document.querySelector('input[name="resposta"]:checked').value;
         const [tipo, texto] = mensagens[resposta];
@@ -140,11 +164,7 @@
         botaoEntrar.disabled = false;
         botaoEntrar.textContent = 'Entrar';
 
-        // 1.1 — permite nova tentativa: limpa a senha e volta o foco para ela
-        if (resposta === 'incorreto') {
-          campos[1].input.value = '';
-          campos[1].input.focus();
-        }
+        if (resposta === 'incorreto') novaTentativa();
 
         // Cenário principal (4) — inicia a sessão e abre a tela inicial
         if (resposta === 'liberado') {
@@ -153,10 +173,13 @@
       }, 600);
     });
 
-    // Volta do "Sair" da tela inicial (UC003)
-    if (new URLSearchParams(location.search).get('sessao') === 'encerrada') {
-      mostrarAlerta('sucesso', 'Sessão encerrada. Até a próxima!');
-    }
+    // No sistema, o painel de resposta simulada não aparece
+    if (MODO_API) document.querySelector('.prototipo-painel').hidden = true;
+
+    // Volta do "Sair" (UC003) ou de uma sessão que venceu
+    const sessao = new URLSearchParams(location.search).get('sessao');
+    if (sessao === 'encerrada') mostrarAlerta('sucesso', 'Sessão encerrada. Até a próxima!');
+    if (sessao === 'expirada') mostrarAlerta('erro', 'Sua sessão terminou. Entre novamente para continuar.');
   </script>
 </body>
 </html>

@@ -1,16 +1,12 @@
 // Profissionais e atendimentos do protótipo. Um atendimento é uma visita (paciente + data +
 // profissional) com os itens lançados — como Atendimento e AtendimentoItem no diagrama de classes.
 
+// O id 1 é a pessoa "logada" no protótipo (veja DadosFicticios em dados.js)
 const PROFISSIONAIS = [
   { id: 1, nome: 'Thiago Fernandes', coren: 'COREN-MS 401.227' },
   { id: 2, nome: 'Ana Paula Lima', coren: 'COREN-MS 512.334' },
   { id: 3, nome: 'Carlos Eduardo Mendes', coren: 'COREN-MS 498.120' },
 ];
-
-// Quem está usando o sistema no protótipo (o perfil muda pelo painel, a pessoa não)
-const USUARIO_LOGADO = 1;
-
-const buscarProfissional = (id) => PROFISSIONAIS.find((profissional) => profissional.id === id);
 
 // Datas relativas a hoje, para o histórico sempre parecer recente
 function diasAtras(dias) {
