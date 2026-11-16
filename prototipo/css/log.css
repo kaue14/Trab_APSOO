@@ -1,0 +1,79 @@
+/* Log de atividades — UC013 (RF013) */
+
+#alerta {
+  margin-bottom: 18px;
+}
+
+.filtros {
+  padding: 18px;
+}
+
+.resultado {
+  margin-top: 18px;
+}
+
+.contagem {
+  margin: 0 0 10px;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+/* Cabeçalho de cada dia dentro da tabela */
+.tabela tr.dia th {
+  padding: 8px 14px;
+  border-top: 1px solid #e0eaed;
+  background: var(--ciano-suave);
+  color: var(--ciano-profundo);
+}
+
+.tabela .hora {
+  width: 72px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Tipo da ação: cinza (acesso), ciano (paciente), verde (atendimento), rosa (usuário), âmbar (configuração) */
+.tipo {
+  display: inline-block;
+  min-width: 86px;
+  margin-right: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: 1px;
+}
+
+.tipo-acesso {
+  background: #e8f0f2;
+  color: var(--texto-suave);
+}
+
+.tipo-paciente {
+  background: var(--ciano-suave);
+  color: var(--ciano-profundo);
+}
+
+.tipo-atendimento {
+  background: var(--sucesso-fundo);
+  color: var(--sucesso);
+}
+
+.tipo-usuario {
+  background: #fbe9ef;
+  color: #9c3d5c;
+}
+
+.tipo-configuracao {
+  background: #fdf3df;
+  color: #8a5a00;
+}
+
+.acao {
+  font-weight: 600;
+}
+
+.tabela .acao + .secundario {
+  margin-top: 2px;
+}

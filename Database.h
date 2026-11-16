@@ -87,6 +87,19 @@ private:
             "    quantidade INTEGER NOT NULL,"
             "    FOREIGN KEY(atendimento_id) REFERENCES atendimentos(id),"
             "    FOREIGN KEY(catalogo_id) REFERENCES catalogo_itens(id)"
+            ");"
+            "CREATE TABLE IF NOT EXISTS log_atividades ("   // RF013: histórico das ações dos usuários
+            "    id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "    data_hora TEXT NOT NULL,"
+            "    profissional_id INTEGER,"
+            "    tipo TEXT NOT NULL,"           // Acesso, Paciente, Atendimento ou Usuario
+            "    acao TEXT NOT NULL,"
+            "    detalhe TEXT,"
+            "    FOREIGN KEY(profissional_id) REFERENCES profissionais(id)"
+            ");"
+            "CREATE TABLE IF NOT EXISTS configuracoes ("    // RF014: dados gerais, uma linha por informação
+            "    chave TEXT PRIMARY KEY,"
+            "    valor TEXT"
             ");";
         executar(sqlSchema, "verificar/criar tabelas");
 

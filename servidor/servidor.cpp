@@ -16,6 +16,8 @@
 #include <shellapi.h>
 
 #include <cctype>
+#include <cmath>
+#include <cstdio>
 #include <map>
 #include <mutex>
 #include <regex>
@@ -26,6 +28,8 @@
 #include "../ProfissionalDAO.h"
 #include "../CatalogoDAO.h"
 #include "../AtendimentoDAO.h"
+#include "../LogAtividadeDAO.h"
+#include "../ConfiguracaoDAO.h"
 #include "../Seguranca.h"
 
 using json = nlohmann::json;
@@ -65,6 +69,17 @@ json paraJson(const Atendimento& a) {
     return {{"id", a.getId()}, {"pacienteId", a.getPacienteId()}, {"profissionalId", a.getProfissionalId()},
             {"dataAtendimento", a.getDataAtendimento()}, {"registradoPor", a.getRegistradoPor()},
             {"itens", itens}, {"total", a.calcularTotalGuia()}};
+}
+
+json paraJson(const DadosGerais& d) {
+    return {{"nomeEmpresa", d.getNomeEmpresa()}, {"cnpj", d.getCnpj()}, {"telefone", d.getTelefone()},
+            {"email", d.getEmail()}, {"cidade", d.getCidade()}, {"uf", d.getUf()}};
+}
+
+json paraJson(const LogAtividade& l) {
+    return {{"id", l.getId()}, {"dataHora", l.getDataHora()}, {"profissionalId", l.getProfissionalId()},
+            {"profissional", l.getNomeProfissional()}, {"tipo", l.getTipo()}, {"acao", l.getAcao()},
+            {"detalhe", l.getDetalhe()}};
 }
 
 template <typename T>
@@ -165,6 +180,109 @@ std::string lerPaciente(const json& corpo, Paciente& p) {
     return "";
 }
 
+// ---------- Textos do log de atividades (RF013) ----------
+
+// "2026-11-14" → "14/11/2026"
+std::string dataBr(const std::string& iso) {
+    if (iso.size() != 10) return iso;
+    return iso.substr(8, 2) + "/" + iso.substr(5, 2) + "/" + iso.substr(0, 4);
+}
+
+// Junta partes como numa frase: "a", "a e b", "a, b e c"
+std::string juntar(const std::vector<std::string>& partes) {
+    std::string texto;
+    for (size_t i = 0; i < partes.size(); i++) {
+        if (i > 0) texto += (i == partes.size() - 1) ? " e " : ", ";
+        texto += partes[i];
+    }
+    return texto;
+}
+
+std::string quantos(int n, const std::string& singular, const std::string& plural) {
+    return std::to_string(n) + " " + (n == 1 ? singular : plural);
+}
+
+std::string nomeDoNivel(const std::string& nivel) {
+    if (nivel == "Tecnico") return "Técnico de Enfermagem";
+    return nivel;
+}
+
+// Edição de paciente: quais dados mudaram (RF013, "alterações de dados")
+std::string alteracoesPaciente(const Paciente& antes, const Paciente& depois) {
+    std::vector<std::string> campos;
+    if (antes.getNome() != depois.getNome()) campos.push_back("nome");
+    if (antes.getDataNascimento() != depois.getDataNascimento()) campos.push_back("data de nascimento");
+    if (antes.getCpf() != depois.getCpf() || antes.getCarteira() != depois.getCarteira()) campos.push_back("documento");
+    if (antes.getRua() != depois.getRua() || antes.getComplemento() != depois.getComplemento() ||
+        antes.getBairro() != depois.getBairro() || antes.getCidade() != depois.getCidade() || antes.getUf() != depois.getUf()) {
+        campos.push_back("endereço");
+    }
+    return campos.empty() ? "salvou sem alterações" : "alterou " + juntar(campos);
+}
+
+// ---------- Configurações (RF014) ----------
+
+// 75.5 → "R$ 75,50"
+std::string reais(double valor) {
+    char texto[32];
+    std::snprintf(texto, sizeof texto, "R$ %.2f", valor);
+    std::string resultado = texto;
+    resultado[resultado.find('.')] = ',';
+    return resultado;
+}
+
+std::string formatarCnpj(const std::string& d) {
+    return d.substr(0, 2) + "." + d.substr(2, 3) + "." + d.substr(5, 3) + "/" + d.substr(8, 4) + "-" + d.substr(12, 2);
+}
+
+std::string formatarTelefone(const std::string& d) {
+    const size_t meio = d.size() - 4;   // (67) 3325-4180 ou (67) 99812-4180
+    return "(" + d.substr(0, 2) + ") " + d.substr(2, meio - 2) + "-" + d.substr(meio);
+}
+
+// Lê e valida os dados gerais; devolve a mensagem de erro, ou "" se estiver certo (5.1)
+std::string lerDadosGerais(const json& corpo, DadosGerais& d) {
+    const std::string cnpj = apenasDigitos(textoDoCorpo(corpo, "cnpj"));
+    const std::string telefone = apenasDigitos(textoDoCorpo(corpo, "telefone"));
+    const std::string email = textoDoCorpo(corpo, "email");
+    std::string uf = textoDoCorpo(corpo, "uf");
+    for (char& c : uf) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+
+    d.setNomeEmpresa(textoDoCorpo(corpo, "nomeEmpresa"));
+    d.setCnpj(cnpj.size() == 14 ? formatarCnpj(cnpj) : "");
+    d.setTelefone(telefone.size() == 10 || telefone.size() == 11 ? formatarTelefone(telefone) : "");
+    d.setEmail(email);
+    d.setCidade(textoDoCorpo(corpo, "cidade"));
+    d.setUf(uf);
+
+    if (d.getNomeEmpresa().empty()) return "Informe o nome da empresa.";
+    if (cnpj.size() != 14) return "Informe o CNPJ com 14 dígitos.";
+    if (!telefone.empty() && d.getTelefone().empty()) return "O telefone deve ter DDD e 8 ou 9 dígitos.";
+    if (!email.empty() && !std::regex_match(email, std::regex(R"([^@\s]+@[^@\s]+\.[^@\s]+)"))) return "Informe um e-mail válido.";
+    if (d.getCidade().empty() || !std::regex_match(uf, std::regex("[A-Z]{2}"))) return "Informe a cidade e a UF.";
+    return "";
+}
+
+std::string alteracoesDadosGerais(const DadosGerais& antes, const DadosGerais& depois) {
+    std::vector<std::string> campos;
+    if (antes.getNomeEmpresa() != depois.getNomeEmpresa()) campos.push_back("nome da empresa");
+    if (antes.getCnpj() != depois.getCnpj()) campos.push_back("CNPJ");
+    if (antes.getTelefone() != depois.getTelefone()) campos.push_back("telefone");
+    if (antes.getEmail() != depois.getEmail()) campos.push_back("e-mail");
+    if (antes.getCidade() != depois.getCidade() || antes.getUf() != depois.getUf()) campos.push_back("cidade");
+    return campos.empty() ? "salvou sem alterações" : "alterou " + juntar(campos);
+}
+
+// Descrição e valor de um item da tabela; devolve a mensagem de erro, ou "" se estiver certo
+std::string lerItemCatalogo(const json& corpo, std::string& descricao, double& valor) {
+    descricao = textoDoCorpo(corpo, "descricao");
+    if (descricao.empty()) return "Informe a descrição do item.";
+    if (!corpo.contains("valor") || !corpo["valor"].is_number()) return "Informe o valor em reais.";
+    valor = std::round(corpo["valor"].get<double>() * 100) / 100;   // centavos
+    if (valor <= 0 || valor >= 100000) return "O valor deve ser maior que zero e menor que R$ 100.000,00.";
+    return "";
+}
+
 int main(int argc, char* argv[]) {
     SetConsoleOutputCP(CP_UTF8);
 
@@ -181,6 +299,22 @@ int main(int argc, char* argv[]) {
     ProfissionalDAO profissionalDao(db);
     CatalogoDAO catalogoDao(db);
     AtendimentoDAO atendimentoDao(db);
+    LogAtividadeDAO logDao(db);
+    ConfiguracaoDAO configuracaoDao(db);
+
+    // Texto do log para um atendimento: "Benedita Alves da Silva — atendimento de 14/11/2026: 2 procedimentos e 3 materiais"
+    auto resumoAtendimento = [&](const Atendimento& a) {
+        int procedimentos = 0, materiais = 0;
+        for (const auto& item : a.getItens()) {
+            if (catalogoDao.buscarPorId(item.getCatalogoId()).getTipo() == "Material") materiais++;
+            else procedimentos++;
+        }
+        std::vector<std::string> partes;
+        if (procedimentos > 0) partes.push_back(quantos(procedimentos, "procedimento", "procedimentos"));
+        if (materiais > 0) partes.push_back(quantos(materiais, "material", "materiais"));
+        return pacienteDao.buscarPorId(a.getPacienteId()).getNome() + " — atendimento de " +
+               dataBr(a.getDataAtendimento()) + ": " + juntar(partes);
+    };
 
     // Primeiro acesso: se ninguém tem senha, cria (ou completa) o administrador inicial
     bool alguemComSenha = false;
@@ -262,11 +396,14 @@ int main(int argc, char* argv[]) {
 
         const std::string codigo = Seguranca::gerarCodigoSessao();
         sessoes[codigo] = usuario.getId();
+        logDao.registrar(usuario.getId(), "Acesso", "Entrou no sistema", "Perfil " + nomeDoNivel(usuario.getNivelAcesso()));
         responder(res, {{"sessao", codigo}, {"usuario", paraJson(usuario)}});
     });
 
     servidor.Post("/api/logout", [&](const httplib::Request& req, httplib::Response& res) {
         std::lock_guard<std::mutex> trava(bancoEmUso);
+        const Profissional usuario = usuarioDaSessao(req);
+        if (usuario.getId() != 0) logDao.registrar(usuario.getId(), "Acesso", "Saiu do sistema", "");
         sessoes.erase(req.get_header_value("X-Sessao"));   // invalida a sessão ativa
         responder(res, {{"ok", true}});
     });
@@ -304,7 +441,8 @@ int main(int argc, char* argv[]) {
     servidor.Post("/api/pacientes", [&](const httplib::Request& req, httplib::Response& res) {
         const json corpo = json::parse(req.body);
         std::lock_guard<std::mutex> trava(bancoEmUso);
-        if (!exigirEnfermeiro(usuarioDaSessao(req), res)) return;
+        const Profissional usuario = usuarioDaSessao(req);
+        if (!exigirEnfermeiro(usuario, res)) return;
 
         Paciente novo;
         const std::string erro = lerPaciente(corpo, novo);
@@ -316,6 +454,7 @@ int main(int argc, char* argv[]) {
             return responderErro(res, 409, "Já existe um paciente cadastrado com esta carteira.");
         }
         if (!pacienteDao.inserir(novo)) return responderErro(res, 500, "Não foi possível salvar o paciente.");
+        logDao.registrar(usuario.getId(), "Paciente", "Cadastrou paciente", novo.getNome());
         responder(res, paraJson(novo), 201);
     });
 
@@ -324,8 +463,10 @@ int main(int argc, char* argv[]) {
         const int id = std::stoi(req.matches[1]);
         const json corpo = json::parse(req.body);
         std::lock_guard<std::mutex> trava(bancoEmUso);
-        if (!exigirEnfermeiro(usuarioDaSessao(req), res)) return;
-        if (pacienteDao.buscarPorId(id).getId() == 0) return responderErro(res, 404, "Paciente não encontrado.");   // 1.2
+        const Profissional usuario = usuarioDaSessao(req);
+        if (!exigirEnfermeiro(usuario, res)) return;
+        const Paciente antes = pacienteDao.buscarPorId(id);
+        if (antes.getId() == 0) return responderErro(res, 404, "Paciente não encontrado.");   // 1.2
 
         Paciente alterado;
         const std::string erro = lerPaciente(corpo, alterado);
@@ -341,6 +482,8 @@ int main(int argc, char* argv[]) {
             return responderErro(res, 409, "Já existe outro paciente cadastrado com esta carteira.");
         }
         if (!pacienteDao.atualizar(alterado)) return responderErro(res, 500, "Não foi possível salvar as alterações.");
+        logDao.registrar(usuario.getId(), "Paciente", "Editou paciente",
+                         alterado.getNome() + " — " + alteracoesPaciente(antes, alterado));
         responder(res, paraJson(alterado));
     });
 
@@ -355,7 +498,8 @@ int main(int argc, char* argv[]) {
     servidor.Post("/api/profissionais", [&](const httplib::Request& req, httplib::Response& res) {
         const json corpo = json::parse(req.body);
         std::lock_guard<std::mutex> trava(bancoEmUso);
-        if (!exigirAdministrador(usuarioDaSessao(req), res)) return;   // 1.1
+        const Profissional usuario = usuarioDaSessao(req);
+        if (!exigirAdministrador(usuario, res)) return;   // 1.1
 
         const std::string nome = textoDoCorpo(corpo, "nome");
         const std::string registro = textoDoCorpo(corpo, "registroConselho");
@@ -384,6 +528,7 @@ int main(int argc, char* argv[]) {
         novo.setCpf(formatarCpf(cpf));
         novo.setSenhaHash(Seguranca::sha256(senha));
         if (!profissionalDao.inserir(novo)) return responderErro(res, 500, "Não foi possível cadastrar o usuário.");
+        logDao.registrar(usuario.getId(), "Usuario", "Cadastrou usuário", nome + " (" + nomeDoNivel(nivel) + ")");
         responder(res, paraJson(novo), 201);
     });
 
@@ -459,7 +604,9 @@ int main(int argc, char* argv[]) {
         atendimento.setRegistradoPor(usuario.getId());   // quem registrou é quem está logado
 
         if (!atendimentoDao.registrarAtendimento(atendimento)) return responderErro(res, 500, "Não foi possível registrar o atendimento.");   // 5.1
-        responder(res, paraJson(atendimentoDao.buscarPorId(atendimento.getId())), 201);
+        const Atendimento registrado = atendimentoDao.buscarPorId(atendimento.getId());
+        logDao.registrar(usuario.getId(), "Atendimento", "Registrou atendimento", resumoAtendimento(registrado));
+        responder(res, paraJson(registrado), 201);
     });
 
     // RF012 — Editar atendimento registrado
@@ -483,7 +630,9 @@ int main(int argc, char* argv[]) {
         corrigido.setRegistradoPor(atual.getRegistradoPor());
 
         if (!atendimentoDao.atualizarAtendimento(corrigido)) return responderErro(res, 500, "Não foi possível salvar as alterações.");
-        responder(res, paraJson(atendimentoDao.buscarPorId(id)));
+        const Atendimento salvo = atendimentoDao.buscarPorId(id);
+        logDao.registrar(usuario.getId(), "Atendimento", "Editou atendimento", resumoAtendimento(salvo));
+        responder(res, paraJson(salvo));
     });
 
     // ---------- RF011 — Fechamento mensal de um paciente (Enfermeiro e Administrador) ----------
@@ -501,6 +650,91 @@ int main(int argc, char* argv[]) {
         responder(res, {{"pacienteId", pacienteId}, {"mes", mes},
                         {"total", atendimentoDao.calcularFechamentoMensal(mes, pacienteId)},
                         {"atendimentos", listaParaJson(atendimentoDao.listarPorPaciente(pacienteId, mes))}});
+    });
+
+    // ---------- RF014 — Configurar sistema (alterações só pelo Administrador) ----------
+    servidor.Get("/api/configuracoes", [&](const httplib::Request& req, httplib::Response& res) {
+        std::lock_guard<std::mutex> trava(bancoEmUso);
+        if (!exigirLogin(usuarioDaSessao(req), res)) return;
+        responder(res, paraJson(configuracaoDao.carregarDadosGerais()));
+    });
+
+    servidor.Put("/api/configuracoes", [&](const httplib::Request& req, httplib::Response& res) {
+        const json corpo = json::parse(req.body);
+        std::lock_guard<std::mutex> trava(bancoEmUso);
+        const Profissional usuario = usuarioDaSessao(req);
+        if (!exigirAdministrador(usuario, res)) return;   // 1.1
+
+        DadosGerais novos;
+        const std::string erro = lerDadosGerais(corpo, novos);
+        if (!erro.empty()) return responderErro(res, 400, erro);   // 5.1
+
+        const DadosGerais antes = configuracaoDao.carregarDadosGerais();
+        if (!configuracaoDao.salvarDadosGerais(novos)) return responderErro(res, 500, "Não foi possível salvar as configurações.");
+        logDao.registrar(usuario.getId(), "Configuracao", "Alterou dados gerais", alteracoesDadosGerais(antes, novos));
+        responder(res, paraJson(novos));
+    });
+
+    // Novo item na tabela de procedimentos ou na lista de materiais
+    servidor.Post("/api/catalogo", [&](const httplib::Request& req, httplib::Response& res) {
+        const json corpo = json::parse(req.body);
+        std::lock_guard<std::mutex> trava(bancoEmUso);
+        const Profissional usuario = usuarioDaSessao(req);
+        if (!exigirAdministrador(usuario, res)) return;
+
+        const std::string codigo = textoDoCorpo(corpo, "codigo");
+        const std::string tipo = textoDoCorpo(corpo, "tipo");
+        std::string descricao;
+        double valor = 0;
+        if (!std::regex_match(codigo, std::regex(R"([A-Za-z0-9/_.-]{3,20})"))) {
+            return responderErro(res, 400, "Informe o código do item: de 3 a 20 letras ou números.");
+        }
+        if (tipo != "Procedimento" && tipo != "Material") return responderErro(res, 400, "Escolha o tipo: Procedimento ou Material.");
+        const std::string erro = lerItemCatalogo(corpo, descricao, valor);
+        if (!erro.empty()) return responderErro(res, 400, erro);
+        if (catalogoDao.buscarPorCodigo(codigo).getId() != 0) return responderErro(res, 409, "Já existe um item com este código na tabela.");
+
+        CatalogoItem novo(0, codigo, descricao, valor, tipo);
+        if (!catalogoDao.inserir(novo)) return responderErro(res, 500, "Não foi possível cadastrar o item.");
+        logDao.registrar(usuario.getId(), "Configuracao", tipo == "Material" ? "Cadastrou material" : "Cadastrou procedimento",
+                         codigo + " — " + descricao + " (" + reais(valor) + ")");
+        responder(res, paraJson(novo), 201);
+    });
+
+    // Altera a descrição ou o valor de um item (o código e o tipo não mudam)
+    servidor.Put(R"(/api/catalogo/(\d+))", [&](const httplib::Request& req, httplib::Response& res) {
+        const int id = std::stoi(req.matches[1]);
+        const json corpo = json::parse(req.body);
+        std::lock_guard<std::mutex> trava(bancoEmUso);
+        const Profissional usuario = usuarioDaSessao(req);
+        if (!exigirAdministrador(usuario, res)) return;
+
+        const CatalogoItem antes = catalogoDao.buscarPorId(id);
+        if (antes.getId() == 0) return responderErro(res, 404, "Item não encontrado na tabela.");
+        std::string descricao;
+        double valor = 0;
+        const std::string erro = lerItemCatalogo(corpo, descricao, valor);
+        if (!erro.empty()) return responderErro(res, 400, erro);   // 5.1
+
+        CatalogoItem alterado = antes;
+        alterado.setDescricao(descricao);
+        alterado.setValor(valor);
+        if (!catalogoDao.atualizar(alterado)) return responderErro(res, 500, "Não foi possível salvar o item.");
+
+        std::vector<std::string> mudancas;
+        if (antes.getDescricao() != descricao) mudancas.push_back("descrição");
+        if (reais(antes.getValor()) != reais(valor)) mudancas.push_back("valor de " + reais(antes.getValor()) + " para " + reais(valor));
+        logDao.registrar(usuario.getId(), "Configuracao", antes.getTipo() == "Material" ? "Alterou material" : "Alterou procedimento",
+                         antes.getCodigo() + " — " + (mudancas.empty() ? "salvou sem alterações" : "alterou " + juntar(mudancas)));
+        responder(res, paraJson(alterado));
+    });
+
+    // ---------- RF013 — Log de atividades (só Administrador) ----------
+    // As 500 ações mais recentes; a tela filtra por tipo, usuário e período
+    servidor.Get("/api/log", [&](const httplib::Request& req, httplib::Response& res) {
+        std::lock_guard<std::mutex> trava(bancoEmUso);
+        if (!exigirAdministrador(usuarioDaSessao(req), res)) return;   // 1.1
+        responder(res, listaParaJson(logDao.listarRecentes()));         // 2.1 — lista vazia: a tela avisa
     });
 
     // ---------- Inicia ----------

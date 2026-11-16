@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cicatrizar System — Configurações</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/formulario.css">
+  <link rel="stylesheet" href="css/configuracoes.css">
+</head>
+<body>
+  <!-- Configurar sistema — UC014 (RF014) -->
+
+  <!-- Ícones usados na tela -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-paciente-novo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/></symbol>
+    <symbol id="i-procedimento" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3H9z"/><path d="M9 11h6M9 15h4"/></symbol>
+    <symbol id="i-material" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></symbol>
+    <symbol id="i-fechamento" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+    <symbol id="i-usuarios" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 21a6.5 6.5 0 0 0-2.5-5.1"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-config" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="m15 8 4 4-4 4M19 12H9"/></symbol>
+    <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  </svg>
+
+  <div class="janela">
+    <div class="barra-titulo">
+      <img src="img/logo-branca.png" alt="">
+      <span>Cicatrizar System — Configurações</span>
+      <div class="controles" aria-hidden="true">
+        <span>&#x2013;</span><span>&#x25A1;</span><span>&#x2715;</span>
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- data-perfis: quais perfis enxergam o item (técnico, enfermeiro, administrador) -->
+      <nav class="menu" aria-label="Menu principal">
+        <div class="menu-marca">
+          <img src="img/logo-branca.png" alt="">
+          <span>Cicatrizar System</span>
+        </div>
+
+        <a href="inicio.html"><svg class="icone"><use href="#i-inicio"/></svg>Início</a>
+
+        <div class="menu-grupo">
+          <h3>Pacientes</h3>
+          <a href="buscar-paciente.html" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-busca"/></svg>Buscar paciente</a>
+          <a href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-paciente-novo"/></svg>Cadastrar paciente</a>
+        </div>
+
+        <div class="menu-grupo">
+          <h3>Atendimentos</h3>
+          <a href="atendimento.html#procedimentos" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+          <a href="atendimento.html#materiais" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+          <a href="fechamento.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+        </div>
+
+        <div class="menu-grupo" data-perfis="administrador">
+          <h3>Administração</h3>
+          <a href="usuarios.html"><svg class="icone"><use href="#i-usuarios"/></svg>Usuários</a>
+          <a href="log.html"><svg class="icone"><use href="#i-log"/></svg>Log de atividades</a>
+          <a href="configuracoes.html" aria-current="page"><svg class="icone"><use href="#i-config"/></svg>Configurações</a>
+        </div>
+
+        <p class="menu-rodape">Versão 1.0</p>
+      </nav>
+
+      <div class="principal">
+        <header class="cabecalho">
+          <h1>Configurações</h1>
+          <div class="usuario">
+            <span class="avatar" aria-hidden="true">TF</span>
+            <div>
+              <div class="usuario-nome">Thiago Fernandes</div>
+              <div class="usuario-perfil" id="perfil-nome"></div>
+            </div>
+            <!-- UC003 — Encerrar sessão -->
+            <a class="botao botao-secundario" id="sair" href="login.html?sessao=encerrada"><svg class="icone"><use href="#i-sair"/></svg>Sair</a>
+          </div>
+        </header>
+
+        <main class="conteudo">
+          <!-- 1.1 — só o Administrador acessa as configurações -->
+          <div class="cartao vazio" data-perfis="tecnico enfermeiro">
+            <svg class="icone"><use href="#i-cadeado"/></svg>
+            <strong>Acesso não permitido para o seu perfil</strong>
+            <span>As configurações do sistema são alteradas apenas por Administradores.</span>
+            <a class="botao botao-secundario" href="inicio.html"><svg class="icone"><use href="#i-inicio"/></svg>Voltar ao início</a>
+          </div>
+
+          <div data-perfis="administrador">
+            <div class="pagina-topo">
+              <p>Ajuste os dados da empresa e a tabela de procedimentos e materiais usada nos atendimentos e no fechamento.</p>
+            </div>
+
+            <!-- Passo 2: dados gerais -->
+            <section class="bloco">
+              <h2>Dados gerais</h2>
+              <form class="cartao formulario" id="form-gerais" novalidate>
+                <p class="alerta" id="alerta-gerais" role="alert" hidden></p>
+                <div class="grade">
+                  <div class="campo col-4">
+                    <label for="nomeEmpresa">Nome da empresa <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <input id="nomeEmpresa" type="text" autocomplete="off" required aria-describedby="nomeEmpresa-erro">
+                    <p class="campo-erro" id="nomeEmpresa-erro" hidden></p>
+                  </div>
+                  <div class="campo col-2">
+                    <label for="cnpj">CNPJ <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <input id="cnpj" type="text" inputmode="numeric" maxlength="18" autocomplete="off"
+                           placeholder="00.000.000/0000-00" required aria-describedby="cnpj-erro">
+                    <p class="campo-erro" id="cnpj-erro" hidden></p>
+                  </div>
+
+                  <div class="campo col-2">
+                    <label for="telefone">Telefone</label>
+                    <input id="telefone" type="text" inputmode="tel" maxlength="15" autocomplete="off"
+                           placeholder="(00) 0000-0000" aria-describedby="telefone-erro">
+                    <p class="campo-erro" id="telefone-erro" hidden></p>
+                  </div>
+                  <div class="campo col-4">
+                    <label for="email">E-mail</label>
+                    <input id="email" type="email" autocomplete="off" placeholder="ex.: contato@empresa.com.br"
+                           aria-describedby="email-erro">
+                    <p class="campo-erro" id="email-erro" hidden></p>
+                  </div>
+
+                  <div class="campo col-3">
+                    <label for="cidade">Cidade <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <input id="cidade" type="text" autocomplete="off" required aria-describedby="cidade-erro">
+                    <p class="campo-erro" id="cidade-erro" hidden></p>
+                  </div>
+                  <div class="campo col-1">
+                    <label for="uf">UF <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <select id="uf" required aria-describedby="uf-erro">
+                      <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+                      <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+                      <option>MT</option><option selected>MS</option><option>MG</option><option>PA</option><option>PB</option>
+                      <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                      <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
+                      <option>SE</option><option>TO</option>
+                    </select>
+                    <p class="campo-erro" id="uf-erro" hidden></p>
+                  </div>
+                </div>
+
+                <div class="formulario-rodape">
+                  <p class="nota"><span class="obrigatorio">*</span> Campos obrigatórios</p>
+                  <button type="submit" class="botao botao-primario" id="salvar-gerais">Salvar dados gerais</button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Passo 2: tabela de procedimentos e lista de materiais -->
+            <section class="bloco">
+              <h2>Tabela de procedimentos e materiais</h2>
+
+              <div class="tabela-topo">
+                <div class="segmentado abas" role="radiogroup" aria-label="Lista exibida">
+                  <label><input type="radio" name="lista" value="procedimento" checked><span>Procedimentos <span class="qtd" id="qtd-procedimento"></span></span></label>
+                  <label><input type="radio" name="lista" value="material"><span>Materiais <span class="qtd" id="qtd-material"></span></span></label>
+                </div>
+                <div class="campo busca">
+                  <input id="busca-item" type="search" autocomplete="off" placeholder="Buscar por código ou descrição"
+                         aria-label="Buscar item por código ou descrição">
+                </div>
+                <button type="button" class="botao botao-primario" id="novo-item"><svg class="icone"><use href="#i-mais"/></svg><span id="novo-item-texto">Novo procedimento</span></button>
+              </div>
+
+              <p class="alerta" id="alerta-itens" role="status" hidden></p>
+
+              <!-- Passos 3 a 5: altera ou cadastra um item -->
+              <form class="cartao formulario" id="form-item" novalidate hidden>
+                <h3 id="form-item-titulo">Novo procedimento</h3>
+                <p class="alerta" id="alerta-item" role="alert" hidden></p>
+                <div class="grade">
+                  <div class="campo col-2">
+                    <label for="codigo">Código <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <input id="codigo" type="text" autocomplete="off" maxlength="20" placeholder="ex.: 60090022"
+                           required aria-describedby="codigo-dica codigo-erro">
+                    <p class="campo-dica" id="codigo-dica" hidden>O código e o tipo do item não mudam.</p>
+                    <p class="campo-erro" id="codigo-erro" hidden></p>
+                  </div>
+                  <div class="campo col-3">
+                    <label for="descricao">Descrição <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <input id="descricao" type="text" autocomplete="off" required aria-describedby="descricao-erro">
+                    <p class="campo-erro" id="descricao-erro" hidden></p>
+                  </div>
+                  <div class="campo col-1">
+                    <label for="valor">Valor (R$) <span class="obrigatorio" aria-hidden="true">*</span></label>
+                    <input id="valor" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"
+                           required aria-describedby="valor-erro">
+                    <p class="campo-erro" id="valor-erro" hidden></p>
+                  </div>
+                </div>
+                <div class="formulario-rodape">
+                  <p class="nota"><span class="obrigatorio">*</span> Campos obrigatórios</p>
+                  <button type="button" class="botao botao-secundario" id="cancelar-item">Cancelar</button>
+                  <button type="submit" class="botao botao-primario" id="salvar-item">Salvar item</button>
+                </div>
+              </form>
+
+              <div class="cartao lista-itens">
+                <table class="tabela">
+                  <thead>
+                    <tr><th>Código</th><th>Descrição</th><th class="num">Valor</th><th class="col-acao"></th></tr>
+                  </thead>
+                  <tbody id="itens"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </main>
+
+        <p class="aviso" id="aviso" role="status" hidden></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Só existe no protótipo: escolhe qual perfil está logado para ver o menu de cada um -->
+  <div class="prototipo-painel" role="radiogroup" aria-label="Perfil simulado">
+    <strong>Protótipo — ver como:</strong>
+    <label><input type="radio" name="perfil" value="tecnico"> Técnico de Enfermagem</label>
+    <label><input type="radio" name="perfil" value="enfermeiro"> Enfermeiro</label>
+    <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
+  </div>
+
+  <script src="js/modo.js"></script>
+  <script src="js/formulario.js"></script>
+  <script src="js/catalogo.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // ---------- Comum aos dois formulários ----------
+
+    // Confere um campo com a sua regra e mostra (ou limpa) a mensagem embaixo dele (NF002)
+    function validarCampo(regras, id) {
+      const campo = document.getElementById(id);
+      const mensagem = regras[id](campo.value.trim());
+      const erro = document.getElementById(`${id}-erro`);
+      campo.setAttribute('aria-invalid', mensagem !== '');
+      erro.textContent = mensagem;
+      erro.hidden = mensagem === '';
+      return mensagem === '';
+    }
+
+    // Depois de marcado com erro, o campo é conferido de novo a cada alteração
+    function revalidarAoDigitar(regras) {
+      Object.keys(regras).forEach((id) => {
+        const campo = document.getElementById(id);
+        campo.addEventListener(campo.tagName === 'SELECT' ? 'change' : 'input', () => {
+          if (campo.getAttribute('aria-invalid') === 'true') validarCampo(regras, id);
+        });
+      });
+    }
+
+    function mostrarAlerta(elemento, tipo, texto) {
+      elemento.className = `alerta alerta-${tipo}`;
+      elemento.textContent = texto;
+      elemento.hidden = false;
+      elemento.scrollIntoView({ block: 'nearest' });
+    }
+
+    function limparErros(form) {
+      form.querySelectorAll('[aria-invalid]').forEach((campo) => campo.removeAttribute('aria-invalid'));
+      form.querySelectorAll('.campo-erro').forEach((erro) => { erro.hidden = true; });
+    }
+
+    const reais = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // ---------- Dados gerais ----------
+    const formGerais = document.getElementById('form-gerais');
+    const alertaGerais = document.getElementById('alerta-gerais');
+    const CAMPOS_GERAIS = ['nomeEmpresa', 'cnpj', 'telefone', 'email', 'cidade', 'uf'];
+
+    // O usuário digita só números e a tela coloca a pontuação
+    const mascaraCnpj = (valor) => soDigitos(valor).slice(0, 14)
+      .replace(/^(\d{2})(\d)/, '$1.$2')
+      .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+      .replace(/\.(\d{3})(\d)/, '.$1/$2')
+      .replace(/(\d{4})(\d)/, '$1-$2');
+
+    function mascaraTelefone(valor) {
+      const d = soDigitos(valor).slice(0, 11);
+      if (d.length <= 2) return d ? `(${d}` : '';
+      const meio = d.length === 11 ? 7 : 6;   // celular com 9 dígitos ou fixo com 8
+      return `(${d.slice(0, 2)}) ${d.slice(2, meio)}${d.length > meio ? `-${d.slice(meio)}` : ''}`;
+    }
+
+    const campoCnpj = document.getElementById('cnpj');
+    const campoTelefone = document.getElementById('telefone');
+    campoCnpj.addEventListener('input', () => { campoCnpj.value = mascaraCnpj(campoCnpj.value); });
+    campoTelefone.addEventListener('input', () => { campoTelefone.value = mascaraTelefone(campoTelefone.value); });
+
+    const REGRAS_GERAIS = {
+      nomeEmpresa: (valor) => valor ? '' : 'Informe o nome da empresa.',
+      cnpj: (valor) => !valor ? 'Informe o CNPJ.' : soDigitos(valor).length !== 14 ? 'O CNPJ deve ter 14 dígitos.' : '',
+      telefone: (valor) => !valor || [10, 11].includes(soDigitos(valor).length) ? '' : 'Informe o DDD e o número (8 ou 9 dígitos).',
+      email: (valor) => !valor || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(valor) ? '' : 'Informe um e-mail válido.',
+      cidade: (valor) => valor ? '' : 'Informe a cidade.',
+      uf: (valor) => valor ? '' : 'Selecione a UF.',
+    };
+    revalidarAoDigitar(REGRAS_GERAIS);
+
+    function preencherGerais(dados) {
+      CAMPOS_GERAIS.forEach((id) => { document.getElementById(id).value = dados[id] || ''; });
+      if (!dados.uf) document.getElementById('uf').value = 'MS';
+    }
+
+    // Passos 4 a 6 — valida, grava e confirma
+    formGerais.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      const invalidos = CAMPOS_GERAIS.filter((id) => !validarCampo(REGRAS_GERAIS, id));
+      if (invalidos.length > 0) {   // 5.1
+        mostrarAlerta(alertaGerais, 'erro', 'Não foi possível salvar. Corrija os campos destacados.');
+        document.getElementById(invalidos[0]).focus();
+        return;
+      }
+
+      const dados = Object.fromEntries(CAMPOS_GERAIS.map((id) => [id, document.getElementById(id).value.trim()]));
+      const salvar = document.getElementById('salvar-gerais');
+      salvar.disabled = true;
+      try {
+        preencherGerais(await Dados.salvarDadosGerais(dados));
+        mostrarAlerta(alertaGerais, 'sucesso', 'Dados gerais salvos com sucesso.');
+      } catch (erro) {
+        mostrarAlerta(alertaGerais, 'erro', erro.message);
+      } finally {
+        salvar.disabled = false;
+      }
+    });
+
+    // ---------- Tabela de procedimentos e materiais ----------
+    const formItem = document.getElementById('form-item');
+    const alertaItem = document.getElementById('alerta-item');
+    const alertaItens = document.getElementById('alerta-itens');
+    const campoCodigo = document.getElementById('codigo');
+    const busca = document.getElementById('busca-item');
+    const corpo = document.getElementById('itens');
+
+    let catalogo = [];
+    let editando = null;   // código do item em edição; null quando é um item novo
+
+    const listaAtual = () => document.querySelector('input[name="lista"]:checked').value;   // 'procedimento' | 'material'
+    const nomeDoTipo = (tipo) => (tipo === 'material' ? 'material' : 'procedimento');
+
+    // "75,50" ou "75.50" → "75.50"; o valor guardado tem no máximo 2 casas decimais
+    const valorNormalizado = (texto) => (texto.includes(',') ? texto.replace(/\./g, '').replace(',', '.') : texto);
+
+    const REGRAS_ITEM = {
+      codigo: (valor) => !valor ? 'Informe o código.'
+        : /^[A-Za-z0-9/_.-]{3,20}$/.test(valor) ? '' : 'Use de 3 a 20 letras ou números, sem espaços.',
+      descricao: (valor) => valor ? '' : 'Informe a descrição.',
+      valor: (valor) => {
+        if (!valor) return 'Informe o valor.';
+        if (!/^\d+(\.\d{1,2})?$/.test(valorNormalizado(valor))) return 'Use números com até 2 casas (ex.: 75,50).';
+        const numero = Number(valorNormalizado(valor));
+        return numero > 0 && numero < 100000 ? '' : 'O valor deve ser maior que zero.';
+      },
+    };
+    revalidarAoDigitar(REGRAS_ITEM);
+
+    function mostrarItens(destacarCodigo) {
+      const tipo = listaAtual();
+      const termo = normalizar(busca.value);
+      document.getElementById('qtd-procedimento').textContent = catalogo.filter((i) => i.tipo === 'procedimento').length;
+      document.getElementById('qtd-material').textContent = catalogo.filter((i) => i.tipo === 'material').length;
+      document.getElementById('novo-item-texto').textContent = `Novo ${nomeDoTipo(tipo)}`;
+
+      const itens = catalogo
+        .filter((i) => i.tipo === tipo && (!termo || normalizar(i.descricao).includes(termo) || normalizar(i.codigo).includes(termo)))
+        .sort((a, b) => a.descricao.localeCompare(b.descricao, 'pt-BR'));
+
+      if (itens.length === 0) {
+        const linha = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 4;
+        td.className = 'sem-itens';
+        td.textContent = termo ? `Nenhum item encontrado para “${busca.value.trim()}”.` : 'Nenhum item cadastrado nesta lista.';
+        linha.append(td);
+        return corpo.replaceChildren(linha);
+      }
+
+      corpo.replaceChildren(...itens.map((item) => {
+        const linha = document.createElement('tr');
+        if (item.codigo === destacarCodigo) linha.className = 'linha-nova';
+        const celula = (texto, classe) => {
+          const td = document.createElement('td');
+          td.textContent = texto;
+          if (classe) td.className = classe;
+          return td;
+        };
+        const acao = document.createElement('td');
+        acao.className = 'col-acao';
+        const editar = document.createElement('button');
+        editar.type = 'button';
+        editar.className = 'botao botao-secundario';
+        editar.textContent = 'Editar';
+        editar.setAttribute('aria-label', `Editar ${item.codigo}`);
+        editar.addEventListener('click', () => abrirFormItem(item));
+        acao.append(editar);
+        linha.append(celula(item.codigo, 'col-codigo'), celula(item.descricao), celula(reais(item.valor), 'num'), acao);
+        return linha;
+      }));
+      corpo.querySelector('.linha-nova')?.scrollIntoView({ block: 'nearest' });
+    }
+
+    // Passo 3 — abre o formulário para alterar um item, ou para cadastrar um novo na lista exibida
+    function abrirFormItem(item) {
+      limparErros(formItem);
+      alertaItem.hidden = true;
+      alertaItens.hidden = true;
+      editando = item ? item.codigo : null;
+      const tipo = item ? item.tipo : listaAtual();
+      document.getElementById('form-item-titulo').textContent = item
+        ? `Editar ${nomeDoTipo(tipo)} ${item.codigo}` : `Novo ${nomeDoTipo(tipo)}`;
+      campoCodigo.value = item ? item.codigo : '';
+      campoCodigo.readOnly = Boolean(item);
+      document.getElementById('codigo-dica').hidden = !item;
+      document.getElementById('descricao').value = item ? item.descricao : '';
+      document.getElementById('valor').value = item ? item.valor.toFixed(2).replace('.', ',') : '';
+      formItem.hidden = false;
+      formItem.scrollIntoView({ block: 'nearest' });
+      (item ? document.getElementById('valor') : campoCodigo).focus();
+    }
+
+    function fecharFormItem() {
+      formItem.hidden = true;
+      editando = null;
+    }
+
+    document.getElementById('novo-item').addEventListener('click', () => abrirFormItem(null));
+    document.getElementById('cancelar-item').addEventListener('click', fecharFormItem);
+    busca.addEventListener('input', () => mostrarItens());
+    document.querySelectorAll('input[name="lista"]').forEach((opcao) => opcao.addEventListener('change', () => {
+      fecharFormItem();
+      alertaItens.hidden = true;
+      mostrarItens();
+    }));
+
+    // Passos 4 a 6 — valida, grava e confirma
+    formItem.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+      const ids = editando ? ['descricao', 'valor'] : ['codigo', 'descricao', 'valor'];
+      const invalidos = ids.filter((id) => !validarCampo(REGRAS_ITEM, id));
+      if (invalidos.length > 0) {   // 5.1
+        mostrarAlerta(alertaItem, 'erro', 'Não foi possível salvar. Corrija os campos destacados.');
+        document.getElementById(invalidos[0]).focus();
+        return;
+      }
+
+      const codigo = campoCodigo.value.trim();
+      const tipo = editando ? catalogo.find((i) => i.codigo === editando).tipo : listaAtual();
+      const dados = {
+        descricao: document.getElementById('descricao').value.trim(),
+        valor: Number(valorNormalizado(document.getElementById('valor').value.trim())),
+      };
+      const salvar = document.getElementById('salvar-item');
+      salvar.disabled = true;
+      try {
+        if (editando) await Dados.atualizarItemCatalogo(editando, dados);
+        else await Dados.cadastrarItemCatalogo({ codigo, tipo, ...dados });
+        const nome = nomeDoTipo(tipo);
+        const texto = editando
+          ? `${nome[0].toUpperCase()}${nome.slice(1)} ${codigo} atualizado: ${reais(dados.valor)}.`
+          : `${nome[0].toUpperCase()}${nome.slice(1)} ${codigo} cadastrado na tabela.`;
+        catalogo = await Dados.listarCatalogo();
+        fecharFormItem();
+        busca.value = '';
+        mostrarItens(codigo);
+        mostrarAlerta(alertaItens, 'sucesso', texto);
+        corpo.querySelector('.linha-nova')?.scrollIntoView({ block: 'nearest' });   // a linha salva fica à vista
+      } catch (erro) {
+        mostrarAlerta(alertaItem, 'erro', erro.message);   // ex.: código já cadastrado
+        if (/código/i.test(erro.message)) campoCodigo.focus();
+      } finally {
+        salvar.disabled = false;
+      }
+    });
+
+    // ---------- Passos 1 e 2 — só o Administrador carrega (no protótipo, o perfil pode mudar pelo painel) ----------
+    let carregado = false;
+    async function carregarConfiguracoes() {
+      if (perfilAtual !== 'administrador' || carregado) return;
+      carregado = true;
+      try {
+        const [gerais, tabela] = await Promise.all([Dados.obterDadosGerais(), Dados.listarCatalogo()]);
+        preencherGerais(gerais);
+        catalogo = tabela;
+        mostrarItens();
+      } catch (erro) {
+        carregado = false;
+        mostrarAlerta(alertaGerais, 'erro', erro.message);
+      }
+    }
+    sessaoPronta.then(carregarConfiguracoes);
+    document.addEventListener('perfilalterado', carregarConfiguracoes);
+  </script>
+</body>
+</html>

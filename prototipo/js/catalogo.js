@@ -1,7 +1,7 @@
-// Tabela de procedimentos e materiais do protótipo, copiada de homecare.db (catalogo_itens),
+// Tabela de procedimentos e materiais do protótipo (ponto de partida), copiada de homecare.db (catalogo_itens),
 // que vem da "TABELA DE VALORES GERAL". Códigos 0071… são materiais; os demais, procedimentos e taxas.
 
-const CATALOGO = [
+const CATALOGO_INICIAL = [
   { codigo: '50000535', descricao: 'CONSULTA DE ENFERMAGEM EM DOMICÍLIO', valor: 80.00, tipo: 'procedimento' },
   { codigo: '60090022', descricao: 'TAXA DE AUXILIAR/TÉCNICO DE ENFERMAGEM NO DOMICÍLIO ATÉ 2 HORAS - DIURNO', valor: 70.00, tipo: 'procedimento' },
   { codigo: '60090030', descricao: 'TAXA DE AUXILIAR/TÉCNICO DE ENFERMAGEM NO DOMICÍLIO ATÉ 2 HORAS - NOTURNO', valor: 78.00, tipo: 'procedimento' },
@@ -71,4 +71,19 @@ const CATALOGO = [
   { codigo: '0071000212', descricao: 'GLICOSE 5% 500ML', valor: 3.48, tipo: 'material' },
 ];
 
-const buscarItemCatalogo = (codigo) => CATALOGO.find((item) => item.codigo === codigo);
+// Alterações feitas em Configurações ficam na sessão do navegador (somem ao fechar a aba)
+function carregarCatalogo() {
+  try {
+    const salvo = sessionStorage.getItem('catalogo');
+    if (salvo) return JSON.parse(salvo);
+  } catch {}
+  return CATALOGO_INICIAL;
+}
+
+function salvarCatalogo(catalogo) {
+  try {
+    sessionStorage.setItem('catalogo', JSON.stringify(catalogo));
+  } catch {}
+}
+
+const buscarItemCatalogo = (codigo) => carregarCatalogo().find((item) => item.codigo === codigo);

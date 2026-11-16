@@ -1,0 +1,128 @@
+/* Configurações — UC014 (RF014) */
+
+.bloco + .bloco {
+  margin-top: 28px;
+}
+
+.bloco > h2 {
+  margin: 0 0 10px;
+  color: var(--texto-suave);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.campo-dica {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 12px;
+}
+
+.campo input[readonly] {
+  background: #f4f9fa;
+  color: var(--texto-suave);
+}
+
+/* Barra acima da tabela: lista exibida, busca e novo item */
+.tabela-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.tabela-topo .abas {
+  flex: 0 0 auto;
+}
+
+.tabela-topo .busca {
+  flex: 1 1 200px;
+}
+
+/* Cada aba com a largura do seu texto; nome da lista e quantidade na mesma linha */
+.abas label {
+  flex: 0 0 auto;
+}
+
+.abas label > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  white-space: nowrap;
+}
+
+.abas .qtd {
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+#alerta-itens,
+#form-item {
+  margin-bottom: 14px;
+}
+
+#form-item h3 {
+  margin: 0 0 16px;
+  font-size: 15px;
+}
+
+/* Lista com rolagem própria e cabeçalho fixo */
+.lista-itens {
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.lista-itens thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.lista-itens td {
+  vertical-align: middle;
+}
+
+.tabela .col-codigo {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabela .num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tabela .col-acao {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tabela .col-acao .botao-secundario {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.tabela td.sem-itens {
+  padding: 28px 14px;
+  color: var(--texto-suave);
+  font-weight: 400;
+  text-align: center;
+}
+
+/* Item recém-salvo */
+.linha-nova td {
+  background: var(--ciano-suave);
+}
+
+@media (max-width: 760px) {
+  .tabela-topo .abas {
+    flex-basis: 100%;
+  }
+}

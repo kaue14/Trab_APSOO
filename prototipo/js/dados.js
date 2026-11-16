@@ -10,6 +10,8 @@
 //   item         { codigo, descricao, valor, tipo: 'procedimento' | 'material' }
 //   profissional { id, nome, coren }
 //   atendimento  { id, pacienteId, data, profissionalId, registradoPor, itens: [{ codigo, quantidade }] }
+//   registro     { id, dataHora: 'aaaa-mm-dd hh:mm:ss', profissionalId, usuario (nome),
+//                  tipo: 'acesso' | 'paciente' | 'atendimento' | 'usuario', acao, detalhe }   (log de atividades)
 
 // Erro com a mensagem pronta para mostrar na tela (as do servidor seguem os casos de uso)
 class ErroDoSistema extends Error {
@@ -84,6 +86,7 @@ const DadosApi = (() => {
     if (!catalogo) catalogo = await chamar('GET', '/api/catalogo');
     return catalogo;
   }
+  const itemDe = (item) => ({ codigo: item.codigo, descricao: item.descricao, valor: item.valor, tipo: item.tipo.toLowerCase() });
 
   const atendimentoDe = (a) => ({
     id: a.id, pacienteId: a.pacienteId, data: a.dataAtendimento, profissionalId: a.profissionalId,
@@ -137,9 +140,7 @@ const DadosApi = (() => {
     },
 
     async listarCatalogo() {
-      return (await catalogoDaApi()).map((item) => ({
-        codigo: item.codigo, descricao: item.descricao, valor: item.valor, tipo: item.tipo.toLowerCase(),
-      }));
+      return (await catalogoDaApi()).map(itemDe);
     },
     async listarProfissionais() {
       return (await chamar('GET', '/api/profissionais')).map((p) => ({ id: p.id, nome: p.nome, coren: p.registroConselho }));
@@ -171,6 +172,33 @@ const DadosApi = (() => {
       const resposta = await chamar('GET', `/api/fechamento?paciente=${pacienteId}&mes=${mes}`);
       return { total: resposta.total, atendimentos: resposta.atendimentos.map(atendimentoDe) };
     },
+
+    // RF014 — Configurações: dados gerais e tabela de procedimentos e materiais (alterações só do Administrador)
+    async obterDadosGerais() {
+      return chamar('GET', '/api/configuracoes');
+    },
+    async salvarDadosGerais(dados) {
+      return chamar('PUT', '/api/configuracoes', dados);
+    },
+    async cadastrarItemCatalogo(dados) {
+      const novo = await chamar('POST', '/api/catalogo', { ...dados, tipo: dados.tipo === 'material' ? 'Material' : 'Procedimento' });
+      catalogo = null;   // a tabela mudou: é lida de novo na próxima consulta
+      return itemDe(novo);
+    },
+    async atualizarItemCatalogo(codigo, dados) {
+      const atual = (await catalogoDaApi()).find((item) => item.codigo === codigo);
+      const salvo = await chamar('PUT', `/api/catalogo/${atual.id}`, { descricao: dados.descricao, valor: dados.valor });
+      catalogo = null;
+      return itemDe(salvo);
+    },
+
+    // RF013 — histórico de ações (só Administrador), mais recentes primeiro. O servidor registra sozinho
+    async listarLog() {
+      return (await chamar('GET', '/api/log')).map((r) => ({
+        id: r.id, dataHora: r.dataHora, profissionalId: r.profissionalId, usuario: r.profissional || '—',
+        tipo: r.tipo.toLowerCase(), acao: r.acao, detalhe: r.detalhe,
+      }));
+    },
   };
 })();
 
@@ -180,6 +208,67 @@ const DadosFicticios = (() => {
 
   const proximoId = (lista) => Math.max(0, ...lista.map((registro) => registro.id)) + 1;
   const maisRecentePrimeiro = (a, b) => b.data.localeCompare(a.data) || b.id - a.id;
+
+  // ---------- Log de atividades (RF013) ----------
+  // As ações feitas no protótipo ficam na sessão; as de exemplo estão em log.js
+  function lerLogNovo() {
+    try {
+      return JSON.parse(sessionStorage.getItem('log-novos') || '[]');
+    } catch {
+      return [];
+    }
+  }
+
+  function registrarNoLog(tipo, acao, detalhe) {
+    const agora = new Date();
+    const dd = (n) => String(n).padStart(2, '0');
+    const dataHora = `${agora.getFullYear()}-${dd(agora.getMonth() + 1)}-${dd(agora.getDate())} ${agora.toTimeString().slice(0, 8)}`;
+    const novos = lerLogNovo();
+    novos.push({ id: 1000 + novos.length, dataHora, profissionalId: USUARIO.id, tipo, acao, detalhe });
+    try {
+      sessionStorage.setItem('log-novos', JSON.stringify(novos));
+    } catch {}
+  }
+
+  // "a", "a e b", "a, b e c"
+  const juntar = (partes) => (partes.length < 2 ? partes.join('')
+    : `${partes.slice(0, -1).join(', ')} e ${partes[partes.length - 1]}`);
+
+  function alteracoesPaciente(antes, depois) {
+    const campos = [];
+    if (antes.nome !== depois.nome) campos.push('nome');
+    if (antes.nascimento !== depois.nascimento) campos.push('data de nascimento');
+    if (antes.tipoDoc !== depois.tipoDoc || antes.documento !== depois.documento) campos.push('documento');
+    if (['rua', 'complemento', 'bairro', 'cidade', 'uf'].some((c) => (antes[c] || '') !== (depois[c] || ''))) campos.push('endereço');
+    return campos.length ? `alterou ${juntar(campos)}` : 'salvou sem alterações';
+  }
+
+  function resumoAtendimento(atendimento) {
+    const paciente = carregarPacientes().find((p) => p.id === atendimento.pacienteId);
+    const materiais = atendimento.itens.filter((item) => buscarItemCatalogo(item.codigo).tipo === 'material').length;
+    const procedimentos = atendimento.itens.length - materiais;
+    const partes = [];
+    if (procedimentos) partes.push(`${procedimentos} procedimento${procedimentos > 1 ? 's' : ''}`);
+    if (materiais) partes.push(`${materiais} ${materiais > 1 ? 'materiais' : 'material'}`);
+    return `${paciente ? paciente.nome : 'Paciente'} — atendimento de ${dataParaTela(atendimento.data)}: ${juntar(partes)}`;
+  }
+
+  // ---------- Configurações (RF014) ----------
+  const DADOS_GERAIS_INICIAIS = {
+    nomeEmpresa: 'Cicatrizar Home Care', cnpj: '41.927.365/0001-08', telefone: '(67) 3325-4180',
+    email: '', cidade: 'Campo Grande', uf: 'MS',
+  };
+
+  function lerDadosGerais() {
+    try {
+      const salvos = sessionStorage.getItem('dados-gerais');
+      if (salvos) return JSON.parse(salvos);
+    } catch {}
+    return DADOS_GERAIS_INICIAIS;
+  }
+
+  const NOME_DO_DADO_GERAL = { nomeEmpresa: 'nome da empresa', cnpj: 'CNPJ', telefone: 'telefone', email: 'e-mail', cidade: 'cidade', uf: 'cidade' };
+  const reais = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return {
     async sair() {
@@ -214,19 +303,22 @@ const DadosFicticios = (() => {
       const novo = { id: proximoId(pacientes), ...dados };
       pacientes.push(novo);
       salvarPacientes(pacientes);
+      registrarNoLog('paciente', 'Cadastrou paciente', novo.nome);
       return novo;
     },
     async atualizarPaciente(id, dados) {
       const pacientes = carregarPacientes();
       const paciente = pacientes.find((p) => p.id === Number(id));
       if (!paciente) throw new ErroDoSistema('Paciente não encontrado.', 404);
+      const antes = { ...paciente };
       Object.assign(paciente, dados);
       salvarPacientes(pacientes);
+      registrarNoLog('paciente', 'Editou paciente', `${paciente.nome} — ${alteracoesPaciente(antes, paciente)}`);
       return paciente;
     },
 
     async listarCatalogo() {
-      return CATALOGO;
+      return carregarCatalogo();
     },
     async listarProfissionais() {
       return carregarProfissionais();
@@ -250,7 +342,53 @@ const DadosFicticios = (() => {
       const novo = { id: proximoId(usuarios), ...dados };
       usuarios.push(novo);
       salvarProfissionais(usuarios);
+      registrarNoLog('usuario', 'Cadastrou usuário', `${novo.nome} (${PERFIS[novo.perfil].nome})`);
       return novo;
+    },
+
+    async obterDadosGerais() {
+      return lerDadosGerais();
+    },
+    async salvarDadosGerais(dados) {
+      const antes = lerDadosGerais();
+      const campos = [...new Set(Object.keys(NOME_DO_DADO_GERAL)
+        .filter((campo) => (antes[campo] || '') !== (dados[campo] || '')).map((campo) => NOME_DO_DADO_GERAL[campo]))];
+      try {
+        sessionStorage.setItem('dados-gerais', JSON.stringify(dados));
+      } catch {}
+      registrarNoLog('configuracao', 'Alterou dados gerais', campos.length ? `alterou ${juntar(campos)}` : 'salvou sem alterações');
+      return dados;
+    },
+    async cadastrarItemCatalogo(dados) {
+      const tabela = carregarCatalogo();
+      if (tabela.some((item) => item.codigo === dados.codigo)) {
+        throw new ErroDoSistema('Já existe um item com este código na tabela.', 409);
+      }
+      const novo = { codigo: dados.codigo, descricao: dados.descricao, valor: dados.valor, tipo: dados.tipo };
+      salvarCatalogo([...tabela, novo]);
+      registrarNoLog('configuracao', novo.tipo === 'material' ? 'Cadastrou material' : 'Cadastrou procedimento',
+        `${novo.codigo} — ${novo.descricao} (${reais(novo.valor)})`);
+      return novo;
+    },
+    async atualizarItemCatalogo(codigo, dados) {
+      const tabela = carregarCatalogo().map((item) => ({ ...item }));
+      const item = tabela.find((i) => i.codigo === codigo);
+      if (!item) throw new ErroDoSistema('Item não encontrado na tabela.', 404);
+      const mudancas = [];
+      if (item.descricao !== dados.descricao) mudancas.push('descrição');
+      if (item.valor !== dados.valor) mudancas.push(`valor de ${reais(item.valor)} para ${reais(dados.valor)}`);
+      Object.assign(item, { descricao: dados.descricao, valor: dados.valor });
+      salvarCatalogo(tabela);
+      registrarNoLog('configuracao', item.tipo === 'material' ? 'Alterou material' : 'Alterou procedimento',
+        `${codigo} — ${mudancas.length ? `alterou ${juntar(mudancas)}` : 'salvou sem alterações'}`);
+      return item;
+    },
+
+    async listarLog() {
+      const profissionais = carregarProfissionais();
+      return [...LOG_INICIAL, ...lerLogNovo()]
+        .map((registro) => ({ ...registro, usuario: profissionais.find((p) => p.id === registro.profissionalId)?.nome || '—' }))
+        .sort((a, b) => b.dataHora.localeCompare(a.dataHora) || b.id - a.id);
     },
 
     async listarAtendimentos(pacienteId) {
@@ -261,6 +399,7 @@ const DadosFicticios = (() => {
       const novo = { id: proximoId(atendimentos), registradoPor: USUARIO.id, ...dados };
       atendimentos.push(novo);
       salvarAtendimentos(atendimentos);
+      registrarNoLog('atendimento', 'Registrou atendimento', resumoAtendimento(novo));
       return novo;
     },
     async atualizarAtendimento(id, dados) {
@@ -269,6 +408,7 @@ const DadosFicticios = (() => {
       if (!atendimento) throw new ErroDoSistema('Atendimento não encontrado.', 404);
       Object.assign(atendimento, dados);
       salvarAtendimentos(atendimentos);
+      registrarNoLog('atendimento', 'Editou atendimento', resumoAtendimento(atendimento));
       return atendimento;
     },
 

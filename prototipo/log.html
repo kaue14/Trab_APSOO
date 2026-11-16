@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cicatrizar System — Log de atividades</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/formulario.css">
+  <link rel="stylesheet" href="css/log.css">
+</head>
+<body>
+  <!-- Consultar informações de registro (log) — UC013 (RF013) -->
+
+  <!-- Ícones usados na tela -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-paciente-novo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/></symbol>
+    <symbol id="i-procedimento" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3H9z"/><path d="M9 11h6M9 15h4"/></symbol>
+    <symbol id="i-material" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></symbol>
+    <symbol id="i-fechamento" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+    <symbol id="i-usuarios" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 21a6.5 6.5 0 0 0-2.5-5.1"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-config" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="m15 8 4 4-4 4M19 12H9"/></symbol>
+    <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  </svg>
+
+  <div class="janela">
+    <div class="barra-titulo">
+      <img src="img/logo-branca.png" alt="">
+      <span>Cicatrizar System — Log de atividades</span>
+      <div class="controles" aria-hidden="true">
+        <span>&#x2013;</span><span>&#x25A1;</span><span>&#x2715;</span>
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- data-perfis: quais perfis enxergam o item (técnico, enfermeiro, administrador) -->
+      <nav class="menu" aria-label="Menu principal">
+        <div class="menu-marca">
+          <img src="img/logo-branca.png" alt="">
+          <span>Cicatrizar System</span>
+        </div>
+
+        <a href="inicio.html"><svg class="icone"><use href="#i-inicio"/></svg>Início</a>
+
+        <div class="menu-grupo">
+          <h3>Pacientes</h3>
+          <a href="buscar-paciente.html" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-busca"/></svg>Buscar paciente</a>
+          <a href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-paciente-novo"/></svg>Cadastrar paciente</a>
+        </div>
+
+        <div class="menu-grupo">
+          <h3>Atendimentos</h3>
+          <a href="atendimento.html#procedimentos" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+          <a href="atendimento.html#materiais" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+          <a href="fechamento.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+        </div>
+
+        <div class="menu-grupo" data-perfis="administrador">
+          <h3>Administração</h3>
+          <a href="usuarios.html"><svg class="icone"><use href="#i-usuarios"/></svg>Usuários</a>
+          <a href="log.html" aria-current="page"><svg class="icone"><use href="#i-log"/></svg>Log de atividades</a>
+          <a href="configuracoes.html"><svg class="icone"><use href="#i-config"/></svg>Configurações</a>
+        </div>
+
+        <p class="menu-rodape">Versão 1.0</p>
+      </nav>
+
+      <div class="principal">
+        <header class="cabecalho">
+          <h1>Log de atividades</h1>
+          <div class="usuario">
+            <span class="avatar" aria-hidden="true">TF</span>
+            <div>
+              <div class="usuario-nome">Thiago Fernandes</div>
+              <div class="usuario-perfil" id="perfil-nome"></div>
+            </div>
+            <!-- UC003 — Encerrar sessão -->
+            <a class="botao botao-secundario" id="sair" href="login.html?sessao=encerrada"><svg class="icone"><use href="#i-sair"/></svg>Sair</a>
+          </div>
+        </header>
+
+        <main class="conteudo">
+          <!-- 1.1 — só o Administrador consulta o log -->
+          <div class="cartao vazio" data-perfis="tecnico enfermeiro">
+            <svg class="icone"><use href="#i-cadeado"/></svg>
+            <strong>Acesso não permitido para o seu perfil</strong>
+            <span>O log de atividades é consultado apenas por Administradores.</span>
+            <a class="botao botao-secundario" href="inicio.html"><svg class="icone"><use href="#i-inicio"/></svg>Voltar ao início</a>
+          </div>
+
+          <div data-perfis="administrador">
+            <div class="pagina-topo">
+              <p>Histórico do que foi feito no sistema: acessos, cadastros, atendimentos e alterações de dados.</p>
+            </div>
+
+            <p class="alerta" id="alerta" role="alert" hidden></p>
+
+            <!-- Passo 3: o Administrador consulta as informações (filtra a lista) -->
+            <form class="cartao filtros" id="filtros" aria-label="Filtros do log">
+              <div class="grade">
+                <div class="campo col-2">
+                  <label for="filtro-tipo">Tipo de ação</label>
+                  <select id="filtro-tipo">
+                    <option value="">Todos os tipos</option>
+                    <option value="acesso">Acesso ao sistema</option>
+                    <option value="paciente">Pacientes</option>
+                    <option value="atendimento">Atendimentos</option>
+                    <option value="usuario">Usuários</option>
+                    <option value="configuracao">Configurações</option>
+                  </select>
+                </div>
+                <div class="campo col-2">
+                  <label for="filtro-usuario">Usuário</label>
+                  <select id="filtro-usuario">
+                    <option value="">Todos os usuários</option>
+                  </select>
+                </div>
+                <div class="campo col-2">
+                  <label for="filtro-periodo">Período</label>
+                  <select id="filtro-periodo">
+                    <option value="">Todo o período</option>
+                    <option value="hoje">Hoje</option>
+                    <option value="7">Últimos 7 dias</option>
+                    <option value="30">Últimos 30 dias</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+
+            <section class="resultado" aria-live="polite">
+              <!-- 2.1 — nenhuma atividade registrada -->
+              <div class="cartao vazio" id="log-vazio" hidden>
+                <svg class="icone"><use href="#i-log"/></svg>
+                <strong>Nenhuma atividade registrada</strong>
+                <span>As ações dos usuários aparecem aqui assim que forem feitas.</span>
+              </div>
+
+              <div class="cartao vazio" id="sem-resultado" hidden>
+                <svg class="icone"><use href="#i-busca"/></svg>
+                <strong>Nenhuma atividade encontrada</strong>
+                <span>Não há registros com esses filtros. Mude o tipo, o usuário ou o período.</span>
+              </div>
+
+              <!-- Passo 2: histórico das ações, do mais recente para o mais antigo -->
+              <div id="lista" hidden>
+                <p class="contagem" id="contagem"></p>
+                <div class="cartao tabela-rolagem">
+                  <table class="tabela">
+                    <thead>
+                      <tr><th>Hora</th><th>Usuário</th><th>Atividade</th></tr>
+                    </thead>
+                    <tbody id="registros"></tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          </div>
+        </main>
+
+        <p class="aviso" id="aviso" role="status" hidden></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Só existe no protótipo: escolhe qual perfil está logado para ver o menu de cada um -->
+  <div class="prototipo-painel" role="radiogroup" aria-label="Perfil simulado">
+    <strong>Protótipo — ver como:</strong>
+    <label><input type="radio" name="perfil" value="tecnico"> Técnico de Enfermagem</label>
+    <label><input type="radio" name="perfil" value="enfermeiro"> Enfermeiro</label>
+    <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
+  </div>
+
+  <script src="js/modo.js"></script>
+  <script src="js/formulario.js"></script>
+  <script src="js/atendimentos.js"></script>
+  <script src="js/log.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const filtroTipo = document.getElementById('filtro-tipo');
+    const filtroUsuario = document.getElementById('filtro-usuario');
+    const filtroPeriodo = document.getElementById('filtro-periodo');
+    const corpo = document.getElementById('registros');
+
+    const NOME_DO_TIPO = {
+      acesso: 'Acesso', paciente: 'Paciente', atendimento: 'Atendimento', usuario: 'Usuário', configuracao: 'Configuração',
+    };
+
+    let registros = [];
+
+    function elemento(tag, classe, texto) {
+      const novo = document.createElement(tag);
+      if (classe) novo.className = classe;
+      novo.textContent = texto;
+      return novo;
+    }
+
+    // Cabeçalho de cada dia: "Hoje", "Ontem" ou "sexta-feira, 13/11/2026"
+    function nomeDoDia(dia) {
+      if (dia === hojeIso()) return `Hoje · ${dataParaTela(dia)}`;
+      if (dia === diasAtras(1)) return `Ontem · ${dataParaTela(dia)}`;
+      return new Date(`${dia}T00:00`).toLocaleDateString('pt-BR', {
+        weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric',
+      });
+    }
+
+    // Primeiro dia que entra no período escolhido (aaaa-mm-dd), ou '' para todos
+    function inicioDoPeriodo() {
+      const periodo = filtroPeriodo.value;
+      if (periodo === 'hoje') return hojeIso();
+      if (periodo) return diasAtras(Number(periodo) - 1);
+      return '';
+    }
+
+    function mostrarRegistros() {
+      const inicio = inicioDoPeriodo();
+      const filtrados = registros.filter((r) =>
+        (!filtroTipo.value || r.tipo === filtroTipo.value) &&
+        (!filtroUsuario.value || r.usuario === filtroUsuario.value) &&
+        r.dataHora.slice(0, 10) >= inicio);
+
+      document.getElementById('log-vazio').hidden = registros.length > 0;
+      document.getElementById('sem-resultado').hidden = registros.length === 0 || filtrados.length > 0;
+      document.getElementById('lista').hidden = filtrados.length === 0;
+
+      const plural = (n) => (n === 1 ? 'atividade' : 'atividades');
+      document.getElementById('contagem').textContent = filtrados.length === registros.length
+        ? `${registros.length} ${plural(registros.length)} registrada${registros.length === 1 ? '' : 's'}`
+        : `${filtrados.length} de ${registros.length} atividades`;
+
+      const linhas = [];
+      let diaAnterior = '';
+      filtrados.forEach((registro) => {
+        const dia = registro.dataHora.slice(0, 10);
+        if (dia !== diaAnterior) {
+          const cabecalho = document.createElement('tr');
+          cabecalho.className = 'dia';
+          const titulo = elemento('th', '', nomeDoDia(dia));
+          titulo.colSpan = 3;
+          titulo.scope = 'colgroup';
+          cabecalho.append(titulo);
+          linhas.push(cabecalho);
+          diaAnterior = dia;
+        }
+
+        const linha = document.createElement('tr');
+        const atividade = document.createElement('td');
+        atividade.append(elemento('span', `tipo tipo-${registro.tipo}`, NOME_DO_TIPO[registro.tipo] || registro.tipo),
+          elemento('span', 'acao', registro.acao));
+        if (registro.detalhe) atividade.append(elemento('span', 'secundario', registro.detalhe));
+
+        linha.append(elemento('td', 'hora', registro.dataHora.slice(11, 16)), elemento('td', '', registro.usuario), atividade);
+        linhas.push(linha);
+      });
+      corpo.replaceChildren(...linhas);
+    }
+
+    // Lista de usuários do filtro: quem aparece no log, em ordem alfabética
+    function montarFiltroUsuario() {
+      const nomes = [...new Set(registros.map((r) => r.usuario))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+      filtroUsuario.replaceChildren(filtroUsuario.options[0], ...nomes.map((nome) => new Option(nome, nome)));
+    }
+
+    // Passos 1 e 2 — só o Administrador carrega o log (no protótipo, o perfil pode mudar pelo painel)
+    let carregado = false;
+    async function carregarLog() {
+      if (perfilAtual !== 'administrador' || carregado) return;
+      carregado = true;
+      try {
+        registros = await Dados.listarLog();
+        montarFiltroUsuario();
+        mostrarRegistros();
+      } catch (erro) {
+        carregado = false;
+        const alerta = document.getElementById('alerta');
+        alerta.className = 'alerta alerta-erro';
+        alerta.textContent = erro.message;
+        alerta.hidden = false;
+      }
+    }
+    sessaoPronta.then(carregarLog);
+    document.addEventListener('perfilalterado', carregarLog);
+
+    [filtroTipo, filtroUsuario, filtroPeriodo].forEach((filtro) => filtro.addEventListener('change', mostrarRegistros));
+    document.getElementById('filtros').addEventListener('submit', (evento) => evento.preventDefault());
+  </script>
+</body>
+</html>

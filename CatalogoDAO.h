@@ -161,6 +161,24 @@ public:
         sqlite3_finalize(stmt);
         return sucesso;
     }
+
+    // RF014 — Atualiza a descrição e o valor de um item (o código e o tipo não mudam)
+    bool atualizar(const CatalogoItem& item) {
+        std::string sql = "UPDATE catalogo_itens SET descricao = ?, valor = ? WHERE id = ?;";
+        sqlite3_stmt* stmt;
+
+        if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+            return false;
+        }
+
+        sqlite3_bind_text(stmt, 1, item.getDescricao().c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_double(stmt, 2, item.getValor());
+        sqlite3_bind_int(stmt, 3, item.getId());
+
+        bool sucesso = (sqlite3_step(stmt) == SQLITE_DONE);
+        sqlite3_finalize(stmt);
+        return sucesso;
+    }
 };
 
 #endif
