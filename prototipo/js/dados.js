@@ -5,6 +5,7 @@
 //
 // Formato que as telas usam:
 //   usuario      { id, nome, perfil: 'tecnico' | 'enfermeiro' | 'administrador' }
+//                na tela Usuários, também { coren, login, cpf }
 //   paciente     { id, nome, nascimento, tipoDoc: 'CPF' | 'Carteira', documento, rua, complemento, bairro, cidade, uf }
 //   item         { codigo, descricao, valor, tipo: 'procedimento' | 'material' }
 //   profissional { id, nome, coren }
@@ -58,7 +59,9 @@ const DadosApi = (() => {
   }
 
   const PERFIL_DO_NIVEL = { Tecnico: 'tecnico', Enfermeiro: 'enfermeiro', Administrador: 'administrador' };
+  const NIVEL_DO_PERFIL = { tecnico: 'Tecnico', enfermeiro: 'Enfermeiro', administrador: 'Administrador' };
   const usuarioDe = (p) => ({ id: p.id, nome: p.nome, perfil: PERFIL_DO_NIVEL[p.nivelAcesso] || 'tecnico' });
+  const usuarioCompletoDe = (p) => ({ ...usuarioDe(p), coren: p.registroConselho, login: p.login, cpf: p.cpf });
 
   // O banco guarda CPF e carteira separados; a tela mostra um dos dois (a carteira, se houver)
   const pacienteDe = (p) => ({
@@ -142,6 +145,17 @@ const DadosApi = (() => {
       return (await chamar('GET', '/api/profissionais')).map((p) => ({ id: p.id, nome: p.nome, coren: p.registroConselho }));
     },
 
+    // RF002/RF004/RF005 — usuários do sistema (cadastro só pelo Administrador)
+    async listarUsuarios() {
+      return (await chamar('GET', '/api/profissionais')).map(usuarioCompletoDe);
+    },
+    async cadastrarUsuario(dados) {
+      return usuarioCompletoDe(await chamar('POST', '/api/profissionais', {
+        nome: dados.nome, cpf: dados.cpf, registroConselho: dados.coren, nivelAcesso: NIVEL_DO_PERFIL[dados.perfil],
+        login: dados.login, senha: dados.senha,
+      }));
+    },
+
     async listarAtendimentos(pacienteId) {
       return (await chamar('GET', `/api/atendimentos?paciente=${pacienteId}`)).map(atendimentoDe);
     },
@@ -215,7 +229,28 @@ const DadosFicticios = (() => {
       return CATALOGO;
     },
     async listarProfissionais() {
-      return PROFISSIONAIS;
+      return carregarProfissionais();
+    },
+
+    async listarUsuarios() {
+      return [...carregarProfissionais()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    },
+    // Confere repetições como o servidor. A senha não é guardada: no protótipo não há login de verdade
+    async cadastrarUsuario({ senha, ...dados }) {
+      const usuarios = carregarProfissionais();
+      if (usuarios.some((u) => u.login === dados.login)) {
+        throw new ErroDoSistema('Este login já está cadastrado. Escolha outro login.', 409);
+      }
+      if (usuarios.some((u) => soDigitos(u.cpf || '') === soDigitos(dados.cpf))) {
+        throw new ErroDoSistema('Já existe um usuário com este CPF.', 409);
+      }
+      if (usuarios.some((u) => normalizar(u.coren) === normalizar(dados.coren))) {
+        throw new ErroDoSistema('Já existe um usuário com este registro profissional.', 409);
+      }
+      const novo = { id: proximoId(usuarios), ...dados };
+      usuarios.push(novo);
+      salvarProfissionais(usuarios);
+      return novo;
     },
 
     async listarAtendimentos(pacienteId) {

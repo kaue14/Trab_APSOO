@@ -367,17 +367,21 @@ int main(int argc, char* argv[]) {
         // 2.1 — campos obrigatórios e formatos
         if (nome.empty() || registro.empty() || login.empty()) return responderErro(res, 400, "Informe o nome, o registro profissional (COREN) e o login.");
         if (nivel != "Tecnico" && nivel != "Enfermeiro" && nivel != "Administrador") return responderErro(res, 400, "Escolha o nível de acesso: Tecnico, Enfermeiro ou Administrador.");
-        if (!cpf.empty() && cpf.size() != 11) return responderErro(res, 400, "O CPF deve ter 11 dígitos.");
+        if (cpf.size() != 11) return responderErro(res, 400, "Informe o CPF com 11 dígitos.");   // UC004/UC005, passo 2
+        // Começa com letra, para não ser confundido com um CPF na hora de entrar
+        if (!std::regex_match(login, std::regex(R"([a-z][a-z0-9._-]{2,29})"))) {
+            return responderErro(res, 400, "O login deve ter de 3 a 30 caracteres, começando por letra: letras minúsculas, números, ponto, hífen ou sublinhado.");
+        }
         if (senha.size() < 6) return responderErro(res, 400, "A senha deve ter pelo menos 6 caracteres.");
 
         // 3.1 — login, CPF ou registro já usados
         if (profissionalDao.buscarPorLoginOuCpf(login, "").getId() != 0) return responderErro(res, 409, "Este login já está cadastrado. Escolha outro login.");
-        if (!cpf.empty() && profissionalDao.buscarPorLoginOuCpf("", cpf).getId() != 0) return responderErro(res, 409, "Já existe um usuário com este CPF.");
+        if (profissionalDao.buscarPorLoginOuCpf("", cpf).getId() != 0) return responderErro(res, 409, "Já existe um usuário com este CPF.");
         if (profissionalDao.buscarPorRegistro(registro).getId() != 0) return responderErro(res, 409, "Já existe um usuário com este registro profissional.");
 
         Profissional novo(0, nome, registro, nivel);
         novo.setLogin(login);
-        novo.setCpf(cpf.empty() ? "" : formatarCpf(cpf));
+        novo.setCpf(formatarCpf(cpf));
         novo.setSenhaHash(Seguranca::sha256(senha));
         if (!profissionalDao.inserir(novo)) return responderErro(res, 500, "Não foi possível cadastrar o usuário.");
         responder(res, paraJson(novo), 201);
