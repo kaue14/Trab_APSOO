@@ -111,6 +111,9 @@ const DadosApi = (() => {
       return usuarioDe(await chamar('GET', '/api/sessao'));
     },
 
+    async listarPacientes() {
+      return (await chamar('GET', '/api/pacientes')).map(pacienteDe);
+    },
     async buscarPacientes(termo) {
       return (await chamar('GET', `/api/pacientes?busca=${encodeURIComponent(termo)}`)).map(pacienteDe);
     },
@@ -148,6 +151,12 @@ const DadosApi = (() => {
     async atualizarAtendimento(id, dados) {
       return atendimentoDe(await chamar('PUT', `/api/atendimentos/${id}`, await atendimentoParaApi(dados)));
     },
+
+    // RF011 — atendimentos do paciente no mês (aaaa-mm) e o total calculado pelo servidor
+    async consultarFechamento(pacienteId, mes) {
+      const resposta = await chamar('GET', `/api/fechamento?paciente=${pacienteId}&mes=${mes}`);
+      return { total: resposta.total, atendimentos: resposta.atendimentos.map(atendimentoDe) };
+    },
   };
 })();
 
@@ -172,6 +181,9 @@ const DadosFicticios = (() => {
       return { ...USUARIO, perfil };
     },
 
+    async listarPacientes() {
+      return [...carregarPacientes()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    },
     async buscarPacientes(termo) {
       const nome = normalizar(termo);
       const numero = soDigitos(termo);
@@ -223,6 +235,15 @@ const DadosFicticios = (() => {
       Object.assign(atendimento, dados);
       salvarAtendimentos(atendimentos);
       return atendimento;
+    },
+
+    async consultarFechamento(pacienteId, mes) {
+      const doMes = carregarAtendimentos()
+        .filter((a) => a.pacienteId === pacienteId && a.data.startsWith(mes))
+        .sort((a, b) => a.data.localeCompare(b.data) || a.id - b.id);
+      const total = doMes.flatMap((a) => a.itens)
+        .reduce((soma, item) => soma + item.quantidade * buscarItemCatalogo(item.codigo).valor, 0);
+      return { total, atendimentos: doMes };
     },
   };
 })();

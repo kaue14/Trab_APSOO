@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cicatrizar System — Fechamento mensal</title>
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/formulario.css">
+  <link rel="stylesheet" href="css/fechamento.css">
+</head>
+<body>
+  <!-- Consultar fechamento mensal — UC011 (RF011). fechamento.html?paciente=2 já abre com o paciente -->
+
+  <!-- Ícones usados na tela -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></symbol>
+    <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-paciente-novo" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/></symbol>
+    <symbol id="i-procedimento" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2.5h6v3H9z"/><path d="M9 11h6M9 15h4"/></symbol>
+    <symbol id="i-material" viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></symbol>
+    <symbol id="i-fechamento" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+    <symbol id="i-usuarios" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 21a6.5 6.5 0 0 0-2.5-5.1"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-config" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+    <symbol id="i-sair" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="m15 8 4 4-4 4M19 12H9"/></symbol>
+    <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  </svg>
+
+  <div class="janela">
+    <div class="barra-titulo">
+      <img src="img/logo-branca.png" alt="">
+      <span>Cicatrizar System — Fechamento mensal</span>
+      <div class="controles" aria-hidden="true">
+        <span>&#x2013;</span><span>&#x25A1;</span><span>&#x2715;</span>
+      </div>
+    </div>
+
+    <div class="app">
+      <!-- data-perfis: quais perfis enxergam o item (técnico, enfermeiro, administrador) -->
+      <nav class="menu" aria-label="Menu principal">
+        <div class="menu-marca">
+          <img src="img/logo-branca.png" alt="">
+          <span>Cicatrizar System</span>
+        </div>
+
+        <a href="inicio.html"><svg class="icone"><use href="#i-inicio"/></svg>Início</a>
+
+        <div class="menu-grupo">
+          <h3>Pacientes</h3>
+          <a href="buscar-paciente.html" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-busca"/></svg>Buscar paciente</a>
+          <a href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-paciente-novo"/></svg>Cadastrar paciente</a>
+        </div>
+
+        <div class="menu-grupo">
+          <h3>Atendimentos</h3>
+          <a href="atendimento.html#procedimentos" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
+          <a href="atendimento.html#materiais" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
+          <a href="fechamento.html" aria-current="page" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+        </div>
+
+        <div class="menu-grupo" data-perfis="administrador">
+          <h3>Administração</h3>
+          <a href="#"><svg class="icone"><use href="#i-usuarios"/></svg>Usuários</a>
+          <a href="#"><svg class="icone"><use href="#i-log"/></svg>Log de atividades</a>
+          <a href="#"><svg class="icone"><use href="#i-config"/></svg>Configurações</a>
+        </div>
+
+        <p class="menu-rodape">Versão 1.0</p>
+      </nav>
+
+      <div class="principal">
+        <header class="cabecalho">
+          <h1>Fechamento mensal</h1>
+          <div class="usuario">
+            <span class="avatar" aria-hidden="true">TF</span>
+            <div>
+              <div class="usuario-nome">Thiago Fernandes</div>
+              <div class="usuario-perfil" id="perfil-nome"></div>
+            </div>
+            <!-- UC003 — Encerrar sessão -->
+            <a class="botao botao-secundario" id="sair" href="login.html?sessao=encerrada"><svg class="icone"><use href="#i-sair"/></svg>Sair</a>
+          </div>
+        </header>
+
+        <main class="conteudo">
+          <!-- 1.1 — Técnico de Enfermagem não acessa o fechamento mensal -->
+          <div class="cartao vazio" data-perfis="tecnico">
+            <svg class="icone"><use href="#i-cadeado"/></svg>
+            <strong>Acesso não permitido para o seu perfil</strong>
+            <span>O fechamento mensal é consultado apenas por Enfermeiros e Administradores.</span>
+            <a class="botao botao-secundario" href="inicio.html"><svg class="icone"><use href="#i-inicio"/></svg>Voltar ao início</a>
+          </div>
+
+          <div data-perfis="enfermeiro administrador">
+            <div class="pagina-topo">
+              <p>Veja, por paciente, tudo o que foi lançado no mês: procedimentos, materiais e valores da tabela.</p>
+            </div>
+
+            <!-- Passos 2 e 3: seleciona o paciente, informa mês e ano e consulta -->
+            <form class="cartao filtros" id="form-fechamento" novalidate>
+              <div class="grade">
+                <div class="campo col-3">
+                  <label for="paciente">Paciente <span class="obrigatorio" aria-hidden="true">*</span></label>
+                  <select id="paciente" name="paciente" required aria-describedby="paciente-erro">
+                    <option value="">Selecione o paciente</option>
+                  </select>
+                  <p class="campo-erro" id="paciente-erro" hidden></p>
+                </div>
+                <div class="campo col-2">
+                  <label for="mes">Mês e ano <span class="obrigatorio" aria-hidden="true">*</span></label>
+                  <input id="mes" name="mes" type="month" required aria-describedby="mes-erro">
+                  <p class="campo-erro" id="mes-erro" hidden></p>
+                </div>
+                <div class="col-1">
+                  <button type="submit" class="botao botao-primario"><svg class="icone"><use href="#i-busca"/></svg>Consultar</button>
+                </div>
+              </div>
+            </form>
+
+            <section class="resultado" aria-live="polite">
+              <div class="cartao vazio" id="estado-inicial">
+                <svg class="icone"><use href="#i-fechamento"/></svg>
+                <strong>Escolha o paciente e o mês</strong>
+                <span>O fechamento reúne os procedimentos e materiais lançados no período, com os valores da tabela.</span>
+              </div>
+
+              <!-- 2.2 — nenhum registro no período -->
+              <div class="cartao vazio" id="sem-registros" hidden>
+                <svg class="icone"><use href="#i-fechamento"/></svg>
+                <strong id="sem-registros-texto"></strong>
+                <span>Confira o mês escolhido ou registre os atendimentos do período.</span>
+              </div>
+
+              <!-- Passos 4 e 5: lista consolidada do período -->
+              <div class="fechamento-conteudo" id="fechamento" hidden>
+                <div class="cartao resumo-fechamento">
+                  <div class="resumo-titulo">
+                    <span class="rotulo-pequeno">Fechamento de</span>
+                    <strong id="resumo-paciente"></strong>
+                    <span class="periodo" id="resumo-periodo"></span>
+                  </div>
+                  <div class="numeros">
+                    <div class="numero"><span>Atendimentos</span><strong id="total-atendimentos"></strong></div>
+                    <div class="numero"><span>Procedimentos</span><strong id="total-procedimentos"></strong></div>
+                    <div class="numero"><span>Materiais (un.)</span><strong id="total-materiais"></strong></div>
+                    <div class="numero numero-total"><span>Total</span><strong id="total-valor"></strong></div>
+                  </div>
+                </div>
+
+                <section class="bloco" id="bloco-procedimento">
+                  <h2>Procedimentos realizados</h2>
+                  <div class="cartao tabela-rolagem">
+                    <table class="tabela">
+                      <thead>
+                        <tr><th>Código</th><th>Descrição</th><th>Dias</th><th class="num">Qtde.</th><th class="num">Valor unit.</th><th class="num">Subtotal</th></tr>
+                      </thead>
+                      <tbody id="lista-procedimento"></tbody>
+                      <tfoot><tr><td colspan="5">Subtotal de procedimentos</td><td class="num" id="subtotal-procedimento"></td></tr></tfoot>
+                    </table>
+                  </div>
+                </section>
+
+                <section class="bloco" id="bloco-material">
+                  <h2>Materiais utilizados</h2>
+                  <div class="cartao tabela-rolagem">
+                    <table class="tabela">
+                      <thead>
+                        <tr><th>Código</th><th>Descrição</th><th>Dias</th><th class="num">Qtde.</th><th class="num">Valor unit.</th><th class="num">Subtotal</th></tr>
+                      </thead>
+                      <tbody id="lista-material"></tbody>
+                      <tfoot><tr><td colspan="5">Subtotal de materiais</td><td class="num" id="subtotal-material"></td></tr></tfoot>
+                    </table>
+                  </div>
+                </section>
+
+                <section class="bloco">
+                  <h2>Atendimentos no período</h2>
+                  <div class="cartao tabela-rolagem">
+                    <table class="tabela">
+                      <thead>
+                        <tr><th>Data</th><th>Profissional executante</th><th class="num">Procedimentos</th><th class="num">Materiais (un.)</th><th class="num">Valor</th></tr>
+                      </thead>
+                      <tbody id="lista-atendimentos"></tbody>
+                    </table>
+                  </div>
+                </section>
+              </div>
+            </section>
+          </div>
+        </main>
+
+        <p class="aviso" id="aviso" role="status" hidden></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Só existe no protótipo: escolhe qual perfil está logado para ver o menu de cada um -->
+  <div class="prototipo-painel" role="radiogroup" aria-label="Perfil simulado">
+    <strong>Protótipo — ver como:</strong>
+    <label><input type="radio" name="perfil" value="tecnico"> Técnico de Enfermagem</label>
+    <label><input type="radio" name="perfil" value="enfermeiro"> Enfermeiro</label>
+    <label><input type="radio" name="perfil" value="administrador"> Administrador</label>
+  </div>
+
+  <script src="js/modo.js"></script>
+  <script src="js/formulario.js"></script>
+  <script src="js/pacientes.js"></script>
+  <script src="js/catalogo.js"></script>
+  <script src="js/atendimentos.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const form = document.getElementById('form-fechamento');
+    const campoPaciente = document.getElementById('paciente');
+    const campoMes = document.getElementById('mes');
+
+    let pacientes = [];
+    let catalogo = [];
+    let profissionais = [];
+
+    const dinheiro = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+    const itemDoCatalogo = (codigo) => catalogo.find((item) => item.codigo === codigo);
+    const nomeDoProfissional = (id) => (profissionais.find((p) => p.id === id) || { nome: '—' }).nome;
+
+    // "2026-11" → "Novembro de 2026"
+    function nomeDoMes(mes) {
+      const [ano, numero] = mes.split('-').map(Number);
+      const texto = new Date(ano, numero - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      return texto[0].toUpperCase() + texto.slice(1);
+    }
+
+    function marcarErro(campo, mensagem) {
+      const erro = document.getElementById(`${campo.id}-erro`);
+      campo.setAttribute('aria-invalid', mensagem !== '');
+      erro.textContent = mensagem;
+      erro.hidden = mensagem === '';
+    }
+
+    function linha(celulas) {
+      const tr = document.createElement('tr');
+      celulas.forEach(([texto, classe]) => {
+        const td = document.createElement('td');
+        td.textContent = texto;
+        if (classe) td.className = classe;
+        tr.append(td);
+      });
+      return tr;
+    }
+
+    function mostrarSo(id) {
+      ['estado-inicial', 'sem-registros', 'fechamento'].forEach((outro) => {
+        document.getElementById(outro).hidden = outro !== id;
+      });
+    }
+
+    // Passo 5 — lista consolidada: cada item aparece uma vez, com a soma das quantidades e os dias de uso
+    function mostrarFechamento(paciente, mes, resposta) {
+      const consolidado = new Map();
+      const porAtendimento = resposta.atendimentos.map((atendimento) => {
+        const resumo = { procedimentos: 0, materiais: 0, valor: 0 };
+        atendimento.itens.forEach((item) => {
+          const dados = itemDoCatalogo(item.codigo);
+          const linhaItem = consolidado.get(item.codigo) || { dados, quantidade: 0, dias: new Set() };
+          linhaItem.quantidade += item.quantidade;
+          linhaItem.dias.add(atendimento.data.slice(8));
+          consolidado.set(item.codigo, linhaItem);
+          resumo[dados.tipo === 'procedimento' ? 'procedimentos' : 'materiais'] += item.quantidade;
+          resumo.valor += item.quantidade * dados.valor;
+        });
+        return { atendimento, resumo };
+      });
+
+      const totais = { procedimento: 0, material: 0 };
+      const quantidades = { procedimento: 0, material: 0 };
+      ['procedimento', 'material'].forEach((tipo) => {
+        const linhas = [...consolidado.values()]
+          .filter((l) => l.dados.tipo === tipo)
+          .sort((a, b) => a.dados.descricao.localeCompare(b.dados.descricao, 'pt-BR'));
+        const corpo = document.getElementById(`lista-${tipo}`);
+        corpo.replaceChildren(...linhas.map((l) => {
+          const subtotal = l.quantidade * l.dados.valor;
+          totais[tipo] += subtotal;
+          quantidades[tipo] += l.quantidade;
+          return linha([
+            [l.dados.codigo], [l.dados.descricao], [[...l.dias].sort().join(', '), 'dias'],
+            [l.quantidade, 'num'], [dinheiro.format(l.dados.valor), 'num'], [dinheiro.format(subtotal), 'num'],
+          ]);
+        }));
+        document.getElementById(`subtotal-${tipo}`).textContent = dinheiro.format(totais[tipo]);
+        document.getElementById(`bloco-${tipo}`).hidden = linhas.length === 0;
+      });
+
+      document.getElementById('lista-atendimentos').replaceChildren(...porAtendimento.map(({ atendimento, resumo }) => linha([
+        [dataParaTela(atendimento.data)], [nomeDoProfissional(atendimento.profissionalId)],
+        [resumo.procedimentos, 'num'], [resumo.materiais, 'num'], [dinheiro.format(resumo.valor), 'num'],
+      ])));
+
+      document.getElementById('resumo-paciente').textContent = paciente.nome;
+      document.getElementById('resumo-periodo').textContent = `${nomeDoMes(mes)} · ${paciente.tipoDoc} ${paciente.documento}`;
+      document.getElementById('total-atendimentos').textContent = resposta.atendimentos.length;
+      document.getElementById('total-procedimentos').textContent = quantidades.procedimento;
+      document.getElementById('total-materiais').textContent = quantidades.material;
+      document.getElementById('total-valor').textContent = dinheiro.format(resposta.total);
+      mostrarSo('fechamento');
+    }
+
+    async function consultar() {
+      // 2.1 — paciente ou período não informados
+      const erroPaciente = campoPaciente.value ? '' : 'Selecione o paciente.';
+      const erroMes = /^\d{4}-\d{2}$/.test(campoMes.value) ? '' : 'Informe o mês e o ano.';
+      marcarErro(campoPaciente, erroPaciente);
+      marcarErro(campoMes, erroMes);
+      if (erroPaciente || erroMes) return (erroPaciente ? campoPaciente : campoMes).focus();
+
+      const paciente = pacientes.find((p) => p.id === Number(campoPaciente.value));
+      try {
+        const resposta = await Dados.consultarFechamento(paciente.id, campoMes.value);   // passo 4
+        if (resposta.atendimentos.length === 0) {
+          // 2.2 — sem registros no período
+          document.getElementById('sem-registros-texto').textContent =
+            `Nenhum registro de ${paciente.nome} em ${nomeDoMes(campoMes.value)}.`;
+          return mostrarSo('sem-registros');
+        }
+        mostrarFechamento(paciente, campoMes.value, resposta);
+      } catch (erro) {
+        mostrarAviso(erro.message);
+      }
+    }
+
+    form.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      consultar();
+    });
+    [campoPaciente, campoMes].forEach((campo) => campo.addEventListener('change', () => {
+      if (campo.getAttribute('aria-invalid') === 'true') marcarErro(campo, '');
+    }));
+
+    async function montarTela() {
+      await sessaoPronta;
+      campoMes.value = hojeIso().slice(0, 7);
+      try {
+        [pacientes, catalogo, profissionais] = await Promise.all([
+          Dados.listarPacientes(), Dados.listarCatalogo(), Dados.listarProfissionais(),
+        ]);
+      } catch (erro) {
+        return mostrarAviso(erro.message);
+      }
+      pacientes.forEach((paciente) => {
+        const opcao = document.createElement('option');
+        opcao.value = paciente.id;
+        opcao.textContent = `${paciente.nome} — ${paciente.tipoDoc} ${paciente.documento}`;
+        campoPaciente.append(opcao);
+      });
+
+      // Vindo da busca com o paciente escolhido, já mostra o mês atual
+      const id = new URLSearchParams(location.search).get('paciente');
+      if (id && pacientes.some((p) => p.id === Number(id))) {
+        campoPaciente.value = id;
+        if (perfilAtual !== 'tecnico') consultar();
+      }
+    }
+    montarTela();
+  </script>
+</body>
+</html>

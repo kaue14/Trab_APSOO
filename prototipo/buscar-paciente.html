@@ -55,7 +55,7 @@
           <h3>Atendimentos</h3>
           <a href="atendimento.html#procedimentos" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
           <a href="atendimento.html#materiais" data-perfis="tecnico enfermeiro administrador"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
-          <a href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+          <a href="fechamento.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
         </div>
 
         <div class="menu-grupo" data-perfis="administrador">
@@ -130,7 +130,7 @@
                   <a class="botao botao-primario" id="link-procedimento" href="atendimento.html#procedimentos"><svg class="icone"><use href="#i-procedimento"/></svg>Registrar procedimento</a>
                   <a class="botao botao-secundario" id="link-material" href="atendimento.html#materiais"><svg class="icone"><use href="#i-material"/></svg>Registrar material</a>
                   <a class="botao botao-secundario" id="link-editar" href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-editar"/></svg>Editar dados</a>
-                  <a class="botao botao-secundario" href="#" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
+                  <a class="botao botao-secundario" id="link-fechamento" href="fechamento.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-fechamento"/></svg>Fechamento mensal</a>
                 </div>
               </div>
 
@@ -205,6 +205,7 @@
       document.getElementById('link-editar').href = `paciente.html?id=${paciente.id}`;
       document.getElementById('link-procedimento').href = `atendimento.html?paciente=${paciente.id}#procedimentos`;
       document.getElementById('link-material').href = `atendimento.html?paciente=${paciente.id}#materiais`;
+      document.getElementById('link-fechamento').href = `fechamento.html?paciente=${paciente.id}`;
       selecionado.hidden = false;
     }
 
