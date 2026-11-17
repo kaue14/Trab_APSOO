@@ -13,7 +13,7 @@ private:
     // Campos auxiliares populados via JOIN com catalogo_itens para exibição e cálculo
     std::string codigo_item;
     std::string descricao_item;
-    double valor_unitario;
+    double valor_unitario;         // guardado no registro: o preço da tabela naquele dia
 
 public:
     // Construtor vazio

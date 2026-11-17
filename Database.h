@@ -85,6 +85,7 @@ private:
             "    atendimento_id INTEGER NOT NULL,"
             "    catalogo_id INTEGER NOT NULL,"
             "    quantidade INTEGER NOT NULL,"
+            "    valor_unitario REAL,"          // preço da tabela no dia do registro (o fechamento não muda depois)
             "    FOREIGN KEY(atendimento_id) REFERENCES atendimentos(id),"
             "    FOREIGN KEY(catalogo_id) REFERENCES catalogo_itens(id)"
             ");"
@@ -113,6 +114,7 @@ private:
         adicionarColunaSeFaltar("profissionais", "cpf", "TEXT");
         adicionarColunaSeFaltar("profissionais", "senha_hash", "TEXT");
         adicionarColunaSeFaltar("atendimentos", "registrado_por", "INTEGER");
+        adicionarColunaSeFaltar("atendimento_itens", "valor_unitario", "REAL");
 
         const char* sqlAjustes =
             // O SQLite não aceita UNIQUE em ALTER TABLE, então a unicidade vem por índice
@@ -121,6 +123,10 @@ private:
             "CREATE UNIQUE INDEX IF NOT EXISTS idx_profissionais_cpf ON profissionais(cpf);"
             // Atendimentos antigos: considera que quem registrou foi o profissional executante
             "UPDATE atendimentos SET registrado_por = profissional_id WHERE registrado_por IS NULL;"
+            // Itens antigos, de antes de o preço ser guardado: ficam com o valor atual da tabela
+            "UPDATE atendimento_itens SET valor_unitario = "
+            "(SELECT valor FROM catalogo_itens WHERE catalogo_itens.id = atendimento_itens.catalogo_id) "
+            "WHERE valor_unitario IS NULL;"
             // Separa a tabela de valores em procedimentos e materiais (códigos 0071... são materiais)
             "UPDATE catalogo_itens SET tipo = CASE WHEN codigo LIKE '0071%' THEN 'Material' ELSE 'Procedimento' END "
             "WHERE tipo = 'Geral';";

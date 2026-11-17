@@ -5,6 +5,7 @@
 #include "Atendimento.h"
 #include <string>
 #include <vector>
+#include <map>
 #include <iostream>
 
 class AtendimentoDAO {
@@ -14,10 +15,11 @@ private:
     // Colunas do cabeçalho lidas em todas as consultas, na ordem usada por extrairCabecalho
     const std::string colunas = "id, paciente_id, profissional_id, data_atendimento, registrado_por";
 
-    // Carrega todos os materiais/procedimentos do  atendimento e faz JOIN com o catálogo
+    // Carrega todos os materiais/procedimentos do  atendimento e faz JOIN com o catálogo.
+    // O valor é o guardado no registro (preço do dia), não o valor atual da tabela
     void carregarItensDoAtendimento(Atendimento& atendimento) {
         std::string sql = "SELECT ai.id, ai.atendimento_id, ai.catalogo_id, ai.quantidade, "
-                          "c.codigo, c.descricao, c.valor "
+                          "c.codigo, c.descricao, COALESCE(ai.valor_unitario, c.valor) "
                           "FROM atendimento_itens ai "
                           "INNER JOIN catalogo_itens c ON ai.catalogo_id = c.id "
                           "WHERE ai.atendimento_id = ?;";
@@ -59,9 +61,13 @@ private:
         return atend;
     }
 
-    // Insere os itens na tabela atendimento_itens (chamado dentro de uma transação)
-    bool inserirItens(int atendimentoId, const std::vector<AtendimentoItem>& itens) {
-        std::string sqlItem = "INSERT INTO atendimento_itens (atendimento_id, catalogo_id, quantidade) VALUES (?, ?, ?);";
+    // Insere os itens na tabela atendimento_itens (chamado dentro de uma transação).
+    // Cada item guarda o preço da tabela de agora; na edição, um item que já estava no atendimento
+    // mantém o preço que tinha (valoresAnteriores: catalogo_id → valor)
+    bool inserirItens(int atendimentoId, const std::vector<AtendimentoItem>& itens,
+                      const std::map<int, double>& valoresAnteriores = {}) {
+        std::string sqlItem = "INSERT INTO atendimento_itens (atendimento_id, catalogo_id, quantidade, valor_unitario) "
+                              "VALUES (?, ?, ?, COALESCE(?, (SELECT valor FROM catalogo_itens WHERE id = ?)));";
         for (const auto& item : itens) {
             sqlite3_stmt* stmtItem;
             if (sqlite3_prepare_v2(db, sqlItem.c_str(), -1, &stmtItem, nullptr) != SQLITE_OK) {
@@ -71,6 +77,10 @@ private:
             sqlite3_bind_int(stmtItem, 1, atendimentoId);
             sqlite3_bind_int(stmtItem, 2, item.getCatalogoId());
             sqlite3_bind_int(stmtItem, 3, item.getQuantidade());
+            const auto anterior = valoresAnteriores.find(item.getCatalogoId());
+            if (anterior != valoresAnteriores.end()) sqlite3_bind_double(stmtItem, 4, anterior->second);
+            else sqlite3_bind_null(stmtItem, 4);
+            sqlite3_bind_int(stmtItem, 5, item.getCatalogoId());
 
             if (sqlite3_step(stmtItem) != SQLITE_DONE) {
                 std::cerr << "[Erro AtendimentoDAO] Falha ao inserir item da guia: " << sqlite3_errmsg(db) << std::endl;
@@ -203,6 +213,21 @@ public:
         }
         sqlite3_finalize(stmtAtend);
 
+        // Guarda o preço dos itens que já estavam no atendimento, para não mudar com a edição
+        std::map<int, double> valoresAnteriores;
+        if (sucesso) {
+            std::string sqlValores = "SELECT catalogo_id, valor_unitario FROM atendimento_itens "
+                                     "WHERE atendimento_id = ? AND valor_unitario IS NOT NULL;";
+            sqlite3_stmt* stmtValores;
+            if (sqlite3_prepare_v2(db, sqlValores.c_str(), -1, &stmtValores, nullptr) == SQLITE_OK) {
+                sqlite3_bind_int(stmtValores, 1, atendimento.getId());
+                while (sqlite3_step(stmtValores) == SQLITE_ROW) {
+                    valoresAnteriores[sqlite3_column_int(stmtValores, 0)] = sqlite3_column_double(stmtValores, 1);
+                }
+            }
+            sqlite3_finalize(stmtValores);
+        }
+
         // Os itens antigos saem e entram os corrigidos
         if (sucesso) {
             std::string sqlItens = "DELETE FROM atendimento_itens WHERE atendimento_id = ?;";
@@ -214,16 +239,19 @@ public:
             }
             sqlite3_finalize(stmtItens);
         }
-        if (sucesso) sucesso = inserirItens(atendimento.getId(), atendimento.getItens());
+        if (sucesso) sucesso = inserirItens(atendimento.getId(), atendimento.getItens(), valoresAnteriores);
 
         sqlite3_exec(db, sucesso ? "COMMIT;" : "ROLLBACK;", nullptr, nullptr, nullptr);
         if (sucesso) std::cout << "[DAO] Guia de Atendimento ID " << atendimento.getId() << " atualizada!" << std::endl;
         return sucesso;
     }
 
-    // Editar procedimento/material RF012
+    // Editar procedimento/material RF012 (se o item for trocado por outro, pega o preço atual do novo)
     bool atualizarItemRegistrado(int atendimentoItemId, int novoCatalogoId, int novaQuantidade) {
-        std::string sql = "UPDATE atendimento_itens SET catalogo_id = ?, quantidade = ? WHERE id = ?;";
+        std::string sql = "UPDATE atendimento_itens SET "
+                          "valor_unitario = CASE WHEN catalogo_id = ? THEN valor_unitario "
+                          "ELSE (SELECT valor FROM catalogo_itens WHERE id = ?) END, "
+                          "catalogo_id = ?, quantidade = ? WHERE id = ?;";
         sqlite3_stmt* stmt;
 
         if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
@@ -231,17 +259,19 @@ public:
         }
 
         sqlite3_bind_int(stmt, 1, novoCatalogoId);
-        sqlite3_bind_int(stmt, 2, novaQuantidade);
-        sqlite3_bind_int(stmt, 3, atendimentoItemId);
+        sqlite3_bind_int(stmt, 2, novoCatalogoId);
+        sqlite3_bind_int(stmt, 3, novoCatalogoId);
+        sqlite3_bind_int(stmt, 4, novaQuantidade);
+        sqlite3_bind_int(stmt, 5, atendimentoItemId);
 
         bool sucesso = (sqlite3_step(stmt) == SQLITE_DONE);
         sqlite3_finalize(stmt);
         return sucesso;
     }
 
-    // Consultar fechamento mensal RF011 (pacienteId = 0 soma todos os pacientes)
+    // Consultar fechamento mensal RF011 (pacienteId = 0 soma todos os pacientes), com o preço do dia do registro
     double calcularFechamentoMensal(const std::string& mesAno, int pacienteId = 0) {
-        std::string sql = "SELECT SUM(ai.quantidade * c.valor) "
+        std::string sql = "SELECT SUM(ai.quantidade * COALESCE(ai.valor_unitario, c.valor)) "
                           "FROM atendimento_itens ai "
                           "INNER JOIN atendimentos a ON ai.atendimento_id = a.id "
                           "INNER JOIN catalogo_itens c ON ai.catalogo_id = c.id "

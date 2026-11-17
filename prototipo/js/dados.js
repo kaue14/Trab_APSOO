@@ -9,7 +9,8 @@
 //   paciente     { id, nome, nascimento, tipoDoc: 'CPF' | 'Carteira', documento, rua, complemento, bairro, cidade, uf }
 //   item         { codigo, descricao, valor, tipo: 'procedimento' | 'material' }
 //   profissional { id, nome, coren }
-//   atendimento  { id, pacienteId, data, profissionalId, registradoPor, itens: [{ codigo, quantidade }] }
+//   atendimento  { id, pacienteId, data, profissionalId, registradoPor, itens: [{ codigo, quantidade, valor }] }
+//                (valor = preço da tabela no dia do registro; mudar a tabela depois não altera o atendimento)
 //   registro     { id, dataHora: 'aaaa-mm-dd hh:mm:ss', profissionalId, usuario (nome),
 //                  tipo: 'acesso' | 'paciente' | 'atendimento' | 'usuario', acao, detalhe }   (log de atividades)
 
@@ -90,7 +91,8 @@ const DadosApi = (() => {
 
   const atendimentoDe = (a) => ({
     id: a.id, pacienteId: a.pacienteId, data: a.dataAtendimento, profissionalId: a.profissionalId,
-    registradoPor: a.registradoPor, itens: a.itens.map((item) => ({ codigo: item.codigo, quantidade: item.quantidade })),
+    registradoPor: a.registradoPor,
+    itens: a.itens.map((item) => ({ codigo: item.codigo, quantidade: item.quantidade, valor: item.valorUnitario })),
   });
 
   async function atendimentoParaApi(dados) {
@@ -208,6 +210,13 @@ const DadosFicticios = (() => {
 
   const proximoId = (lista) => Math.max(0, ...lista.map((registro) => registro.id)) + 1;
   const maisRecentePrimeiro = (a, b) => b.data.localeCompare(a.data) || b.id - a.id;
+
+  // Preço de cada item no dia do registro (RF011). Os atendimentos de exemplo foram lançados com a tabela original
+  const valorDoItem = (item) => item.valor
+    ?? (CATALOGO_INICIAL.find((c) => c.codigo === item.codigo) || buscarItemCatalogo(item.codigo)).valor;
+  const comValores = (atendimento) => ({
+    ...atendimento, itens: atendimento.itens.map((item) => ({ ...item, valor: valorDoItem(item) })),
+  });
 
   // ---------- Log de atividades (RF013) ----------
   // As ações feitas no protótipo ficam na sessão; as de exemplo estão em log.js
@@ -392,11 +401,16 @@ const DadosFicticios = (() => {
     },
 
     async listarAtendimentos(pacienteId) {
-      return carregarAtendimentos().filter((atendimento) => atendimento.pacienteId === pacienteId).sort(maisRecentePrimeiro);
+      return carregarAtendimentos().filter((atendimento) => atendimento.pacienteId === pacienteId)
+        .sort(maisRecentePrimeiro).map(comValores);
     },
     async registrarAtendimento(dados) {
       const atendimentos = carregarAtendimentos();
-      const novo = { id: proximoId(atendimentos), registradoPor: USUARIO.id, ...dados };
+      // Cada item guarda o preço da tabela de hoje
+      const itens = dados.itens.map((item) => ({
+        codigo: item.codigo, quantidade: item.quantidade, valor: buscarItemCatalogo(item.codigo).valor,
+      }));
+      const novo = { id: proximoId(atendimentos), registradoPor: USUARIO.id, ...dados, itens };
       atendimentos.push(novo);
       salvarAtendimentos(atendimentos);
       registrarNoLog('atendimento', 'Registrou atendimento', resumoAtendimento(novo));
@@ -406,7 +420,13 @@ const DadosFicticios = (() => {
       const atendimentos = carregarAtendimentos();
       const atendimento = atendimentos.find((a) => a.id === id);
       if (!atendimento) throw new ErroDoSistema('Atendimento não encontrado.', 404);
-      Object.assign(atendimento, dados);
+      // Item que já estava no atendimento mantém o preço; item incluído agora entra com o preço de hoje
+      const anteriores = new Map(atendimento.itens.map((item) => [item.codigo, valorDoItem(item)]));
+      const itens = dados.itens.map((item) => ({
+        codigo: item.codigo, quantidade: item.quantidade,
+        valor: anteriores.get(item.codigo) ?? buscarItemCatalogo(item.codigo).valor,
+      }));
+      Object.assign(atendimento, dados, { itens });
       salvarAtendimentos(atendimentos);
       registrarNoLog('atendimento', 'Editou atendimento', resumoAtendimento(atendimento));
       return atendimento;
@@ -415,9 +435,9 @@ const DadosFicticios = (() => {
     async consultarFechamento(pacienteId, mes) {
       const doMes = carregarAtendimentos()
         .filter((a) => a.pacienteId === pacienteId && a.data.startsWith(mes))
-        .sort((a, b) => a.data.localeCompare(b.data) || a.id - b.id);
-      const total = doMes.flatMap((a) => a.itens)
-        .reduce((soma, item) => soma + item.quantidade * buscarItemCatalogo(item.codigo).valor, 0);
+        .sort((a, b) => a.data.localeCompare(b.data) || a.id - b.id)
+        .map(comValores);
+      const total = doMes.flatMap((a) => a.itens).reduce((soma, item) => soma + item.quantidade * item.valor, 0);
       return { total, atendimentos: doMes };
     },
   };
