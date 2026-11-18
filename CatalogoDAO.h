@@ -52,7 +52,7 @@ public:
         return lista;
     }
 
-    // Filtra apenas "Procedimento", "Material" ou "Kit" (RF009 e RF010)
+    // Filtra apenas "Procedimento", "Material" ou "Kit" (RF007 e RF008)
     std::vector<CatalogoItem> listarPorTipo(const std::string& tipoFiltro) {
         std::vector<CatalogoItem> lista;
         std::string sql = "SELECT id, codigo, descricao, valor, tipo FROM catalogo_itens WHERE tipo = ?;";
@@ -162,7 +162,7 @@ public:
         return sucesso;
     }
 
-    // RF014 — Atualiza a descrição e o valor de um item (o código e o tipo não mudam)
+    // RF012 — Atualiza a descrição e o valor de um item (o código e o tipo não mudam)
     bool atualizar(const CatalogoItem& item) {
         std::string sql = "UPDATE catalogo_itens SET descricao = ?, valor = ? WHERE id = ?;";
         sqlite3_stmt* stmt;

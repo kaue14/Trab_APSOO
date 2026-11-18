@@ -10,8 +10,7 @@
   <link rel="stylesheet" href="css/usuarios.css">
 </head>
 <body>
-  <!-- Cadastrar usuário — UC002 (RF002) | Cadastrar enfermeiro — UC004 (RF004) |
-       Cadastrar técnico de enfermagem — UC005 (RF005)
+  <!-- Cadastrar usuário — UC002 (RF002): Técnico de Enfermagem, Enfermeiro ou Administrador
        usuarios.html#novo → abre direto o formulário de cadastro -->
 
   <!-- Ícones usados na tela -->
@@ -396,7 +395,7 @@
     form.addEventListener('submit', async (evento) => {
       evento.preventDefault();
 
-      // 2.1 (UC002) / 3.1 (UC004, UC005) — campos obrigatórios vazios ou inválidos
+      // 2.1 (UC002) — campos obrigatórios vazios ou inválidos
       const invalidos = Object.keys(VALIDACOES).filter((id) => !validarCampo(id));
       if (invalidos.length > 0) {
         mostrarAlerta(alerta, 'erro', 'Não foi possível cadastrar. Corrija os campos destacados.');

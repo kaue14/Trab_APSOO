@@ -46,7 +46,7 @@ private:
             "CREATE TABLE IF NOT EXISTS pacientes ("
             "    id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "    nome TEXT NOT NULL,"
-            "    cpf TEXT UNIQUE,"              // RF006: o paciente tem CPF ou carteira
+            "    cpf TEXT UNIQUE,"              // RF004: o paciente tem CPF ou carteira
             "    data_nascimento TEXT,"
             "    carteira TEXT,"
             "    rua TEXT,"
@@ -76,7 +76,7 @@ private:
             "    paciente_id INTEGER NOT NULL,"
             "    profissional_id INTEGER NOT NULL,"
             "    data_atendimento TEXT NOT NULL,"
-            "    registrado_por INTEGER,"       // RF012: Técnico só edita o que ele registrou
+            "    registrado_por INTEGER,"       // RF010: Técnico só edita o que ele registrou
             "    FOREIGN KEY(paciente_id) REFERENCES pacientes(id),"
             "    FOREIGN KEY(profissional_id) REFERENCES profissionais(id)"
             ");"
@@ -89,7 +89,7 @@ private:
             "    FOREIGN KEY(atendimento_id) REFERENCES atendimentos(id),"
             "    FOREIGN KEY(catalogo_id) REFERENCES catalogo_itens(id)"
             ");"
-            "CREATE TABLE IF NOT EXISTS log_atividades ("   // RF013: histórico das ações dos usuários
+            "CREATE TABLE IF NOT EXISTS log_atividades ("   // RF011: histórico das ações dos usuários
             "    id INTEGER PRIMARY KEY AUTOINCREMENT,"
             "    data_hora TEXT NOT NULL,"
             "    profissional_id INTEGER,"
@@ -98,7 +98,7 @@ private:
             "    detalhe TEXT,"
             "    FOREIGN KEY(profissional_id) REFERENCES profissionais(id)"
             ");"
-            "CREATE TABLE IF NOT EXISTS configuracoes ("    // RF014: dados gerais, uma linha por informação
+            "CREATE TABLE IF NOT EXISTS configuracoes ("    // RF012: dados gerais, uma linha por informação
             "    chave TEXT PRIMARY KEY,"
             "    valor TEXT"
             ");";

@@ -156,7 +156,7 @@ std::string textoDoCorpo(const json& corpo, const char* campo) {
     return aparar(corpo.value(campo, std::string()));
 }
 
-// RF006/RF008 — lê e valida os dados do paciente; devolve a mensagem de erro, ou "" se estiver certo
+// RF004/RF006 — lê e valida os dados do paciente; devolve a mensagem de erro, ou "" se estiver certo
 std::string lerPaciente(const json& corpo, Paciente& p) {
     const std::string cpf = apenasDigitos(textoDoCorpo(corpo, "cpf"));
     const std::string carteira = apenasDigitos(textoDoCorpo(corpo, "carteira"));
@@ -180,7 +180,7 @@ std::string lerPaciente(const json& corpo, Paciente& p) {
     return "";
 }
 
-// ---------- Textos do log de atividades (RF013) ----------
+// ---------- Textos do log de atividades (RF011) ----------
 
 // "2026-11-14" → "14/11/2026"
 std::string dataBr(const std::string& iso) {
@@ -207,7 +207,7 @@ std::string nomeDoNivel(const std::string& nivel) {
     return nivel;
 }
 
-// Edição de paciente: quais dados mudaram (RF013, "alterações de dados")
+// Edição de paciente: quais dados mudaram (RF011, "alterações de dados")
 std::string alteracoesPaciente(const Paciente& antes, const Paciente& depois) {
     std::vector<std::string> campos;
     if (antes.getNome() != depois.getNome()) campos.push_back("nome");
@@ -220,7 +220,7 @@ std::string alteracoesPaciente(const Paciente& antes, const Paciente& depois) {
     return campos.empty() ? "salvou sem alterações" : "alterou " + juntar(campos);
 }
 
-// ---------- Configurações (RF014) ----------
+// ---------- Configurações (RF012) ----------
 
 // 75.5 → "R$ 75,50"
 std::string reais(double valor) {
@@ -417,7 +417,7 @@ int main(int argc, char* argv[]) {
     });
 
     // ---------- Pacientes ----------
-    // RF007 — ?busca= procura por nome ou parte do CPF/carteira; sem parâmetro, lista todos
+    // RF005 — ?busca= procura por nome ou parte do CPF/carteira; sem parâmetro, lista todos
     servidor.Get("/api/pacientes", [&](const httplib::Request& req, httplib::Response& res) {
         std::lock_guard<std::mutex> trava(bancoEmUso);
         if (!exigirLogin(usuarioDaSessao(req), res)) return;
@@ -437,7 +437,7 @@ int main(int argc, char* argv[]) {
         responder(res, paraJson(paciente));
     });
 
-    // RF006 — Cadastrar paciente (Enfermeiro e Administrador)
+    // RF004 — Cadastrar paciente (Enfermeiro e Administrador)
     servidor.Post("/api/pacientes", [&](const httplib::Request& req, httplib::Response& res) {
         const json corpo = json::parse(req.body);
         std::lock_guard<std::mutex> trava(bancoEmUso);
@@ -458,7 +458,7 @@ int main(int argc, char* argv[]) {
         responder(res, paraJson(novo), 201);
     });
 
-    // RF008 — Editar dados do paciente (Enfermeiro e Administrador)
+    // RF006 — Editar dados do paciente (Enfermeiro e Administrador)
     servidor.Put(R"(/api/pacientes/(\d+))", [&](const httplib::Request& req, httplib::Response& res) {
         const int id = std::stoi(req.matches[1]);
         const json corpo = json::parse(req.body);
@@ -494,7 +494,7 @@ int main(int argc, char* argv[]) {
         responder(res, listaParaJson(profissionalDao.listarTodos()));
     });
 
-    // RF002/RF004/RF005 — Cadastrar usuário (só Administrador)
+    // RF002 — Cadastrar usuário (só Administrador)
     servidor.Post("/api/profissionais", [&](const httplib::Request& req, httplib::Response& res) {
         const json corpo = json::parse(req.body);
         std::lock_guard<std::mutex> trava(bancoEmUso);
@@ -511,7 +511,7 @@ int main(int argc, char* argv[]) {
         // 2.1 — campos obrigatórios e formatos
         if (nome.empty() || registro.empty() || login.empty()) return responderErro(res, 400, "Informe o nome, o registro profissional (COREN) e o login.");
         if (nivel != "Tecnico" && nivel != "Enfermeiro" && nivel != "Administrador") return responderErro(res, 400, "Escolha o nível de acesso: Tecnico, Enfermeiro ou Administrador.");
-        if (cpf.size() != 11) return responderErro(res, 400, "Informe o CPF com 11 dígitos.");   // UC004/UC005, passo 2
+        if (cpf.size() != 11) return responderErro(res, 400, "Informe o CPF com 11 dígitos.");   // o CPF também serve de login (RF001)
         // Começa com letra, para não ser confundido com um CPF na hora de entrar
         if (!std::regex_match(login, std::regex(R"([a-z][a-z0-9._-]{2,29})"))) {
             return responderErro(res, 400, "O login deve ter de 3 a 30 caracteres, começando por letra: letras minúsculas, números, ponto, hífen ou sublinhado.");
@@ -542,7 +542,7 @@ int main(int argc, char* argv[]) {
         responder(res, listaParaJson(catalogoDao.listarTodos()));
     });
 
-    // ---------- Atendimentos (RF009, RF010, RF012) ----------
+    // ---------- Atendimentos (RF007, RF008, RF010) ----------
     // Lê data, profissional e itens enviados pela tela; devolve a mensagem de erro, ou "" se estiver certo
     auto lerAtendimento = [&](const json& corpo, Atendimento& atendimento) -> std::string {
         const int profissionalId = corpo.value("profissionalId", 0);
@@ -588,7 +588,7 @@ int main(int argc, char* argv[]) {
         responder(res, paraJson(atendimento));
     });
 
-    // RF009/RF010 — Registrar procedimentos e materiais de um atendimento
+    // RF007/RF008 — Registrar procedimentos e materiais de um atendimento
     servidor.Post("/api/atendimentos", [&](const httplib::Request& req, httplib::Response& res) {
         const json corpo = json::parse(req.body);
         std::lock_guard<std::mutex> trava(bancoEmUso);
@@ -609,7 +609,7 @@ int main(int argc, char* argv[]) {
         responder(res, paraJson(registrado), 201);
     });
 
-    // RF012 — Editar atendimento registrado
+    // RF010 — Editar atendimento registrado
     servidor.Put(R"(/api/atendimentos/(\d+))", [&](const httplib::Request& req, httplib::Response& res) {
         const int id = std::stoi(req.matches[1]);
         const json corpo = json::parse(req.body);
@@ -635,7 +635,7 @@ int main(int argc, char* argv[]) {
         responder(res, paraJson(salvo));
     });
 
-    // ---------- RF011 — Fechamento mensal de um paciente (Enfermeiro e Administrador) ----------
+    // ---------- RF009 — Fechamento mensal de um paciente (Enfermeiro e Administrador) ----------
     servidor.Get("/api/fechamento", [&](const httplib::Request& req, httplib::Response& res) {
         std::lock_guard<std::mutex> trava(bancoEmUso);
         if (!exigirEnfermeiro(usuarioDaSessao(req), res)) return;   // 1.1
@@ -652,7 +652,7 @@ int main(int argc, char* argv[]) {
                         {"atendimentos", listaParaJson(atendimentoDao.listarPorPaciente(pacienteId, mes))}});
     });
 
-    // ---------- RF014 — Configurar sistema (alterações só pelo Administrador) ----------
+    // ---------- RF012 — Configurar sistema (alterações só pelo Administrador) ----------
     servidor.Get("/api/configuracoes", [&](const httplib::Request& req, httplib::Response& res) {
         std::lock_guard<std::mutex> trava(bancoEmUso);
         if (!exigirLogin(usuarioDaSessao(req), res)) return;
@@ -729,7 +729,7 @@ int main(int argc, char* argv[]) {
         responder(res, paraJson(alterado));
     });
 
-    // ---------- RF013 — Log de atividades (só Administrador) ----------
+    // ---------- RF011 — Log de atividades (só Administrador) ----------
     // As 500 ações mais recentes; a tela filtra por tipo, usuário e período
     servidor.Get("/api/log", [&](const httplib::Request& req, httplib::Response& res) {
         std::lock_guard<std::mutex> trava(bancoEmUso);

@@ -97,7 +97,7 @@ public:
         this->db = conexao.getDb();
     }
 
-    // Registra o Atendimento e todos os procedimentos/materiais em uma transação RF009 e RF010
+    // Registra o Atendimento e todos os procedimentos/materiais em uma transação RF007 e RF008
     bool registrarAtendimento(Atendimento& atendimento) {
         char* erroMsg = nullptr;
 
@@ -177,7 +177,7 @@ public:
         return lista;
     }
 
-    // Histórico de um paciente, do mais recente ao mais antigo; com mesAno, só daquele mês (RF011/RF012)
+    // Histórico de um paciente, do mais recente ao mais antigo; com mesAno, só daquele mês (RF009/RF010)
     std::vector<Atendimento> listarPorPaciente(int pacienteId, const std::string& mesAno = "") {
         std::vector<Atendimento> lista;
         std::string sql = "SELECT " + colunas + " FROM atendimentos "
@@ -198,7 +198,7 @@ public:
         return lista;
     }
 
-    // Editar atendimento registrado RF012: troca data, profissional e itens numa transação
+    // Editar atendimento registrado RF010: troca data, profissional e itens numa transação
     bool atualizarAtendimento(const Atendimento& atendimento) {
         sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
 
@@ -246,7 +246,7 @@ public:
         return sucesso;
     }
 
-    // Editar procedimento/material RF012 (se o item for trocado por outro, pega o preço atual do novo)
+    // Editar procedimento/material RF010 (se o item for trocado por outro, pega o preço atual do novo)
     bool atualizarItemRegistrado(int atendimentoItemId, int novoCatalogoId, int novaQuantidade) {
         std::string sql = "UPDATE atendimento_itens SET "
                           "valor_unitario = CASE WHEN catalogo_id = ? THEN valor_unitario "
@@ -269,7 +269,7 @@ public:
         return sucesso;
     }
 
-    // Consultar fechamento mensal RF011 (pacienteId = 0 soma todos os pacientes), com o preço do dia do registro
+    // Consultar fechamento mensal RF009 (pacienteId = 0 soma todos os pacientes), com o preço do dia do registro
     double calcularFechamentoMensal(const std::string& mesAno, int pacienteId = 0) {
         std::string sql = "SELECT SUM(ai.quantidade * COALESCE(ai.valor_unitario, c.valor)) "
                           "FROM atendimento_itens ai "

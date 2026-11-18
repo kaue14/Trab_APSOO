@@ -92,7 +92,7 @@ public:
         this->db = conexao.getDb();
     }
 
-    // Cadastrar paciente RF006
+    // Cadastrar paciente RF004
     bool inserir(Paciente& p) {
         std::string sql = "INSERT INTO pacientes (nome, cpf, data_nascimento, carteira, rua, complemento, bairro, cidade, uf) "
                           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -147,7 +147,7 @@ public:
         return lista;
     }
 
-    // Buscar paciente por nome ou número de identificação (CPF ou carteira) RF007
+    // Buscar paciente por nome ou número de identificação (CPF ou carteira) RF005
     std::vector<Paciente> buscarPorTermo(const std::string& termo) {
         std::vector<Paciente> encontrados;
         const std::string nomeBusca = normalizar(termo);
@@ -189,7 +189,7 @@ public:
         return encontrado;
     }
 
-    // Editar dados do paciente RF008
+    // Editar dados do paciente RF006
     bool atualizar(const Paciente& p) {
         std::string sql = "UPDATE pacientes SET nome = ?, cpf = ?, data_nascimento = ?, carteira = ?, "
                           "rua = ?, complemento = ?, bairro = ?, cidade = ?, uf = ? WHERE id = ?;";

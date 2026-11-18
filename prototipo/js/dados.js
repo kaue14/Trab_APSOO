@@ -148,7 +148,7 @@ const DadosApi = (() => {
       return (await chamar('GET', '/api/profissionais')).map((p) => ({ id: p.id, nome: p.nome, coren: p.registroConselho }));
     },
 
-    // RF002/RF004/RF005 — usuários do sistema (cadastro só pelo Administrador)
+    // RF002 — usuários do sistema (cadastro só pelo Administrador)
     async listarUsuarios() {
       return (await chamar('GET', '/api/profissionais')).map(usuarioCompletoDe);
     },
@@ -169,13 +169,13 @@ const DadosApi = (() => {
       return atendimentoDe(await chamar('PUT', `/api/atendimentos/${id}`, await atendimentoParaApi(dados)));
     },
 
-    // RF011 — atendimentos do paciente no mês (aaaa-mm) e o total calculado pelo servidor
+    // RF009 — atendimentos do paciente no mês (aaaa-mm) e o total calculado pelo servidor
     async consultarFechamento(pacienteId, mes) {
       const resposta = await chamar('GET', `/api/fechamento?paciente=${pacienteId}&mes=${mes}`);
       return { total: resposta.total, atendimentos: resposta.atendimentos.map(atendimentoDe) };
     },
 
-    // RF014 — Configurações: dados gerais e tabela de procedimentos e materiais (alterações só do Administrador)
+    // RF012 — Configurações: dados gerais e tabela de procedimentos e materiais (alterações só do Administrador)
     async obterDadosGerais() {
       return chamar('GET', '/api/configuracoes');
     },
@@ -194,7 +194,7 @@ const DadosApi = (() => {
       return itemDe(salvo);
     },
 
-    // RF013 — histórico de ações (só Administrador), mais recentes primeiro. O servidor registra sozinho
+    // RF011 — histórico de ações (só Administrador), mais recentes primeiro. O servidor registra sozinho
     async listarLog() {
       return (await chamar('GET', '/api/log')).map((r) => ({
         id: r.id, dataHora: r.dataHora, profissionalId: r.profissionalId, usuario: r.profissional || '—',
@@ -211,14 +211,14 @@ const DadosFicticios = (() => {
   const proximoId = (lista) => Math.max(0, ...lista.map((registro) => registro.id)) + 1;
   const maisRecentePrimeiro = (a, b) => b.data.localeCompare(a.data) || b.id - a.id;
 
-  // Preço de cada item no dia do registro (RF011). Os atendimentos de exemplo foram lançados com a tabela original
+  // Preço de cada item no dia do registro (RF009). Os atendimentos de exemplo foram lançados com a tabela original
   const valorDoItem = (item) => item.valor
     ?? (CATALOGO_INICIAL.find((c) => c.codigo === item.codigo) || buscarItemCatalogo(item.codigo)).valor;
   const comValores = (atendimento) => ({
     ...atendimento, itens: atendimento.itens.map((item) => ({ ...item, valor: valorDoItem(item) })),
   });
 
-  // ---------- Log de atividades (RF013) ----------
+  // ---------- Log de atividades (RF011) ----------
   // As ações feitas no protótipo ficam na sessão; as de exemplo estão em log.js
   function lerLogNovo() {
     try {
@@ -262,7 +262,7 @@ const DadosFicticios = (() => {
     return `${paciente ? paciente.nome : 'Paciente'} — atendimento de ${dataParaTela(atendimento.data)}: ${juntar(partes)}`;
   }
 
-  // ---------- Configurações (RF014) ----------
+  // ---------- Configurações (RF012) ----------
   const DADOS_GERAIS_INICIAIS = {
     nomeEmpresa: 'Cicatrizar Home Care', cnpj: '41.927.365/0001-08', telefone: '(67) 3325-4180',
     email: '', cidade: 'Campo Grande', uf: 'MS',

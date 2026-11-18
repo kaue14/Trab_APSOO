@@ -3,7 +3,7 @@
 
 #include <string>
 
-// RF014 — Dados gerais da empresa de home care (tela Configurações)
+// RF012 — Dados gerais da empresa de home care (tela Configurações)
 class DadosGerais {
 private:
     std::string nome_empresa;

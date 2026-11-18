@@ -9,7 +9,7 @@ private:
     std::string nome;
     std::string cpf;
     std::string data_nascimento;
-    std::string carteira;           // RF006: o paciente é identificado pela carteira ou pelo CPF
+    std::string carteira;           // RF004: o paciente é identificado pela carteira ou pelo CPF
 
     // Endereço do atendimento domiciliar
     std::string rua;                // logradouro e número

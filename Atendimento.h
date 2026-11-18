@@ -11,7 +11,7 @@ private:
     int paciente_id;
     int profissional_id;
     std::string data_atendimento;
-    int registrado_por;            // RF012: quem lançou o atendimento (Técnico só edita os seus)
+    int registrado_por;            // RF010: quem lançou o atendimento (Técnico só edita os seus)
     std::vector<AtendimentoItem> itens;
 
 public:
@@ -23,7 +23,7 @@ public:
         : id(id), paciente_id(paciente_id), profissional_id(profissional_id), data_atendimento(data_atendimento),
           registrado_por(0) {}
 
-    // Adiciona um procedimento ou material (RF009 / RF010)
+    // Adiciona um procedimento ou material (RF007 / RF008)
     void adicionarItem(int catalogo_id, int quantidade) {
         itens.push_back(AtendimentoItem(catalogo_id, quantidade));
     }

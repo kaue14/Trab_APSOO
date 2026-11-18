@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="css/formulario.css">
 </head>
 <body>
-  <!-- Cadastrar paciente — UC006 (RF006) | Editar dados do paciente — UC008 (RF008)
+  <!-- Cadastrar paciente — UC004 (RF004) | Editar dados do paciente — UC006 (RF006)
        paciente.html → cadastro novo; paciente.html?id=3 → edição do paciente 3 -->
 
   <!-- Ícones usados na tela -->
@@ -97,7 +97,7 @@
               <p id="descricao">Preencha os dados básicos do paciente atendido em home care.</p>
             </div>
 
-            <!-- UC008 1.2 — paciente não encontrado -->
+            <!-- UC006 1.2 — paciente não encontrado -->
             <div class="cartao vazio" id="nao-encontrado" hidden>
               <svg class="icone"><use href="#i-busca"/></svg>
               <strong>Paciente não encontrado</strong>
@@ -212,7 +212,7 @@
     const campoDocumento = document.getElementById('documento');
     const campoNascimento = document.getElementById('nascimento');
 
-    // Modo da tela: sem ?id= é cadastro (UC006); com ?id= é edição (UC008)
+    // Modo da tela: sem ?id= é cadastro (UC004); com ?id= é edição (UC006)
     const parametros = new URLSearchParams(location.search);
     const editando = parametros.has('id');
     let paciente = null;   // na edição, os dados atuais (carregados ao montar a tela)
@@ -322,7 +322,7 @@
       };
     }
 
-    // UC008 1.2 — paciente não encontrado; senão, apresenta os dados atuais (passo 3)
+    // UC006 1.2 — paciente não encontrado; senão, apresenta os dados atuais (passo 3)
     async function montarTela() {
       await sessaoPronta;
       if (!editando) return ajustarTipoDoc();
@@ -340,7 +340,7 @@
     form.addEventListener('submit', async (evento) => {
       evento.preventDefault();
 
-      // UC006 2.1 / UC008 5.1 — campos obrigatórios vazios ou inválidos
+      // UC004 2.1 / UC006 5.1 — campos obrigatórios vazios ou inválidos
       const invalidos = Object.keys(VALIDACOES).filter((id) => !validarCampo(id));
       if (invalidos.length > 0) {
         mostrarAlerta('erro', 'Não foi possível salvar. Corrija os campos destacados.');

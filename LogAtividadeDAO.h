@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>
 
-// RF013 — Grava e consulta o histórico de ações (log de atividades)
+// RF011 — Grava e consulta o histórico de ações (log de atividades)
 class LogAtividadeDAO {
 private:
     sqlite3* db;

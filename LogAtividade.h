@@ -3,7 +3,7 @@
 
 #include <string>
 
-// RF013 — Uma ação registrada no sistema: quem fez, quando, o quê e sobre o quê
+// RF011 — Uma ação registrada no sistema: quem fez, quando, o quê e sobre o quê
 class LogAtividade {
 private:
     int id;

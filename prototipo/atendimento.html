@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="css/atendimento.css">
 </head>
 <body>
-  <!-- Registrar atendimento — UC009 Registrar procedimento, UC010 Registrar material
-       e UC012 Editar procedimento registrado. atendimento.html?paciente=2#materiais -->
+  <!-- Registrar atendimento — UC007 Registrar procedimento, UC008 Registrar material
+       e UC010 Editar procedimento registrado. atendimento.html?paciente=2#materiais -->
 
   <!-- Ícones usados na tela -->
   <svg width="0" height="0" style="position: absolute" aria-hidden="true">
@@ -111,7 +111,7 @@
             <form class="cartao formulario" id="form-atendimento" novalidate>
               <p class="alerta" id="alerta" role="alert" hidden></p>
 
-              <!-- UC012 — modo edição de um atendimento já registrado -->
+              <!-- UC010 — modo edição de um atendimento já registrado -->
               <div class="edicao-aviso" id="edicao-aviso" hidden>
                 <svg class="icone"><use href="#i-editar"/></svg>
                 <span id="edicao-texto"></span>
@@ -134,7 +134,7 @@
                 </div>
               </section>
 
-              <!-- UC009 — procedimentos realizados -->
+              <!-- UC007 — procedimentos realizados -->
               <section class="secao-form" id="procedimentos">
                 <h2>Procedimentos</h2>
                 <div class="grade inclusao">
@@ -163,7 +163,7 @@
                 </div>
               </section>
 
-              <!-- UC010 — materiais utilizados -->
+              <!-- UC008 — materiais utilizados -->
               <section class="secao-form" id="materiais">
                 <h2>Materiais utilizados</h2>
                 <div class="grade inclusao">
@@ -201,7 +201,7 @@
               </div>
             </form>
 
-            <!-- UC012 — atendimentos já registrados para o paciente -->
+            <!-- UC010 — atendimentos já registrados para o paciente -->
             <section class="cartao historico">
               <div class="historico-topo">
                 <h2>Atendimentos registrados</h2>
@@ -257,7 +257,7 @@
     let atendimentos = [];   // histórico do paciente
 
     let itens = [];          // itens do atendimento que está sendo lançado: { codigo, quantidade }
-    let editandoId = null;   // id do atendimento em edição (UC012), ou null ao registrar um novo
+    let editandoId = null;   // id do atendimento em edição (UC010), ou null ao registrar um novo
 
     const itemDoCatalogo = (codigo) => catalogo.find((item) => item.codigo === codigo);
     const profissionalPorId = (id) => profissionais.find((p) => p.id === id) || { nome: '—', coren: '' };
@@ -349,7 +349,7 @@
       if (itens.length > 0) document.getElementById('itens-erro').hidden = true;
     }
 
-    // Passo 3 (UC009 e UC010): escolhe o item da tabela, informa a quantidade e adiciona
+    // Passo 3 (UC007 e UC008): escolhe o item da tabela, informa a quantidade e adiciona
     TIPOS.forEach((tipo) => {
       const campoItem = document.getElementById(`${tipo}-item`);
       const campoQtd = document.getElementById(`${tipo}-qtd`);
@@ -394,7 +394,7 @@
       }));
     });
 
-    // UC012 3.1 — Técnico só edita atendimentos que ele mesmo registrou (no sistema, o servidor confere de novo)
+    // UC010 3.1 — Técnico só edita atendimentos que ele mesmo registrou (no sistema, o servidor confere de novo)
     const podeEditar = (atendimento) => perfilAtual !== 'tecnico' || atendimento.registradoPor === usuarioAtual.id;
 
     function renderizarHistorico() {
@@ -458,7 +458,7 @@
       renderizarHistorico();
     }
 
-    // UC012 passos 2–4: verifica a permissão e apresenta os dados atuais
+    // UC010 passos 2–4: verifica a permissão e apresenta os dados atuais
     function iniciarEdicao(atendimento) {
       if (!podeEditar(atendimento)) {
         mostrarAlerta('erro', 'Você só pode editar atendimentos registrados por você.');

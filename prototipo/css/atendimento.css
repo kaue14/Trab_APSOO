@@ -1,4 +1,4 @@
-/* Registrar atendimento — UC009 (procedimentos), UC010 (materiais) e UC012 (editar procedimento) */
+/* Registrar atendimento — UC007 (procedimentos), UC008 (materiais) e UC010 (editar procedimento) */
 
 /* Paciente atendido */
 .paciente-resumo {
@@ -106,7 +106,7 @@
   margin-top: 16px;
 }
 
-/* Histórico de atendimentos do paciente (UC012) */
+/* Histórico de atendimentos do paciente (UC010) */
 .historico {
   margin-top: 20px;
 }

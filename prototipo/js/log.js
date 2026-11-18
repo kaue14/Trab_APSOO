@@ -1,4 +1,4 @@
-// Log de atividades do protótipo (RF013): ações de exemplo, combinando com os atendimentos de
+// Log de atividades do protótipo (RF011): ações de exemplo, combinando com os atendimentos de
 // atendimentos.js. O que for feito no protótipo entra também (veja registrarNoLog em dados.js).
 // Precisa de formulario.js e atendimentos.js carregados antes.
 

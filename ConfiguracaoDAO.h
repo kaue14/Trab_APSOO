@@ -6,7 +6,7 @@
 #include <string>
 #include <iostream>
 
-// RF014 — Lê e grava os dados gerais na tabela configuracoes (uma linha por informação: chave e valor).
+// RF012 — Lê e grava os dados gerais na tabela configuracoes (uma linha por informação: chave e valor).
 // Assim, uma informação nova no futuro não exige mudar a estrutura do banco.
 class ConfiguracaoDAO {
 private:
