@@ -84,29 +84,28 @@
 
         <main class="conteudo">
           <div class="pagina-topo">
-            <p>Pesquise pelo nome ou pelo número de identificação (CPF ou carteira).</p>
+            <p>Todos os pacientes cadastrados aparecem abaixo. Digite parte do nome ou do número de identificação (CPF ou carteira) para filtrar.</p>
             <a class="botao botao-secundario" href="paciente.html" data-perfis="enfermeiro administrador"><svg class="icone"><use href="#i-paciente-novo"/></svg>Cadastrar paciente</a>
           </div>
 
-          <!-- Passos 2 e 3: informa o critério e solicita a pesquisa -->
+          <!-- Passos 2 e 3: informa o critério; a lista é filtrada enquanto digita -->
           <form class="cartao busca" id="form-busca" role="search" novalidate>
             <div class="campo">
-              <label for="termo">Nome, CPF ou nº da carteira</label>
+              <label for="termo">Filtrar por nome, CPF ou nº da carteira</label>
               <div class="busca-linha">
+                <svg class="icone busca-icone" aria-hidden="true"><use href="#i-busca"/></svg>
                 <input id="termo" name="termo" type="search" autocomplete="off"
-                       placeholder="ex.: Silva ou 318.452.907-14"
-                       aria-describedby="termo-erro" autofocus>
-                <button type="submit" class="botao botao-primario"><svg class="icone"><use href="#i-busca"/></svg>Pesquisar</button>
+                       placeholder="ex.: Silva ou 318.452.907-14" autofocus>
               </div>
-              <p class="campo-erro" id="termo-erro" hidden>Informe um nome ou número de identificação para pesquisar.</p>
             </div>
           </form>
 
           <section class="resultados" aria-live="polite">
+            <!-- Ao abrir: carregando a lista, ou nenhum paciente cadastrado ainda -->
             <div class="cartao vazio" id="estado-inicial">
               <svg class="icone"><use href="#i-busca"/></svg>
-              <strong>Nenhuma pesquisa feita ainda</strong>
-              <span>Digite parte do nome ou o número do documento e clique em Pesquisar.</span>
+              <strong id="estado-titulo">Carregando pacientes…</strong>
+              <span id="estado-texto" hidden>Os pacientes cadastrados vão aparecer aqui.</span>
             </div>
 
             <!-- 4.1 — nenhum paciente corresponde ao critério -->
@@ -134,7 +133,7 @@
                 </div>
               </div>
 
-              <div class="cartao tabela-rolagem">
+              <div class="cartao tabela-rolagem lista-pacientes">
                 <table class="tabela">
                   <thead>
                     <tr>
@@ -172,12 +171,16 @@
   <script>
     const form = document.getElementById('form-busca');
     const termo = document.getElementById('termo');
-    const termoErro = document.getElementById('termo-erro');
     const estadoInicial = document.getElementById('estado-inicial');
     const semResultados = document.getElementById('sem-resultados');
     const lista = document.getElementById('lista');
     const corpo = document.getElementById('pacientes');
     const selecionado = document.getElementById('selecionado');
+
+    let todos = [];             // todos os pacientes, carregados ao abrir a tela
+    let selecionadoId = null;   // paciente escolhido (passo 5); continua escolhido enquanto aparecer na lista
+    let pesquisaAtual = 0;      // descarta a resposta de uma pesquisa antiga que chegue atrasada
+    let espera;
 
     function celula(principal, secundario, etiqueta) {
       const td = document.createElement('td');
@@ -199,6 +202,7 @@
 
     // Passo 5 — o usuário seleciona o paciente desejado
     function selecionar(linha, paciente) {
+      selecionadoId = paciente.id;
       corpo.querySelectorAll('tr').forEach((tr) => tr.setAttribute('aria-selected', 'false'));
       linha.setAttribute('aria-selected', 'true');
       document.getElementById('selecionado-nome').textContent = paciente.nome;
@@ -209,26 +213,39 @@
       selecionado.hidden = false;
     }
 
+    // Passo 4 — mostra os pacientes: todos, ou só os que combinam com o filtro
     function mostrarResultados(encontrados, valor) {
       corpo.replaceChildren();
-      selecionado.hidden = true;
-      estadoInicial.hidden = true;
-      semResultados.hidden = encontrados.length > 0;
+      estadoInicial.hidden = todos.length > 0;
+      semResultados.hidden = todos.length === 0 || encontrados.length > 0;
       lista.hidden = encontrados.length === 0;
 
+      if (todos.length === 0) {
+        document.getElementById('estado-titulo').textContent = 'Nenhum paciente cadastrado ainda';
+        document.getElementById('estado-texto').hidden = false;
+        return;
+      }
+
+      // 4.1 — nenhum paciente corresponde ao critério
       if (encontrados.length === 0) {
+        selecionadoId = null;
+        selecionado.hidden = true;
         document.getElementById('sem-resultados-texto').textContent = `Nenhum paciente encontrado para “${valor}”.`;
         return;
       }
 
-      const plural = encontrados.length > 1 ? 's' : '';
-      document.getElementById('contagem').textContent =
-        `${encontrados.length} paciente${plural} encontrado${plural}. Clique em um paciente para selecioná-lo.`;
+      const s = todos.length > 1 ? 's' : '';
+      document.getElementById('contagem').textContent = (valor
+        ? `${encontrados.length} de ${todos.length} paciente${s}.`
+        : `${todos.length} paciente${s} cadastrado${s}.`) + ' Clique em um paciente para selecioná-lo.';
 
+      let escolhidoNaLista = false;
       encontrados.forEach((paciente) => {
         const linha = document.createElement('tr');
+        const escolhido = paciente.id === selecionadoId;
+        escolhidoNaLista ||= escolhido;
         linha.tabIndex = 0;
-        linha.setAttribute('aria-selected', 'false');
+        linha.setAttribute('aria-selected', escolhido);
         linha.append(
           celula(paciente.nome),
           paciente.nascimento
@@ -246,35 +263,52 @@
         });
         corpo.append(linha);
       });
+
+      // O paciente escolhido saiu da lista com o filtro: desfaz a seleção
+      if (!escolhidoNaLista) {
+        selecionadoId = null;
+        selecionado.hidden = true;
+      }
     }
 
-    form.addEventListener('submit', async (evento) => {
-      evento.preventDefault();
+    async function pesquisar() {
       const valor = termo.value.trim();
+      const numero = ++pesquisaAtual;
+      if (valor === '') return mostrarResultados(todos, '');
 
-      // 2.1 — sem critério de busca
-      const vazio = valor === '';
-      termo.setAttribute('aria-invalid', vazio);
-      termoErro.hidden = !vazio;
-      if (vazio) {
-        termo.focus();
-        return;
-      }
-
-      // Passo 4 — no sistema, a pesquisa é feita pelo servidor no banco
+      // No sistema, o filtro é feito pelo servidor no banco
       try {
-        mostrarResultados(await Dados.buscarPacientes(valor), valor);
+        const encontrados = await Dados.buscarPacientes(valor);
+        if (numero === pesquisaAtual) mostrarResultados(encontrados, valor);
       } catch (erro) {
         mostrarAviso(erro.message);
       }
+    }
+
+    // Filtra enquanto digita, depois de uma pausa curta (não pesquisa a cada letra)
+    termo.addEventListener('input', () => {
+      clearTimeout(espera);
+      espera = setTimeout(pesquisar, 200);
     });
 
-    termo.addEventListener('input', () => {
-      if (termo.value.trim() !== '') {
-        termo.setAttribute('aria-invalid', false);
-        termoErro.hidden = true;
-      }
+    // Enter filtra na hora
+    form.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      clearTimeout(espera);
+      pesquisar();
     });
+
+    // Passo 1 — ao abrir, carrega e mostra todos os pacientes
+    (async () => {
+      await sessaoPronta;
+      try {
+        todos = await Dados.listarPacientes();
+        pesquisar();   // se o campo já veio preenchido (ex.: voltar no navegador), aplica o filtro
+      } catch (erro) {
+        document.getElementById('estado-titulo').textContent = 'Não foi possível carregar os pacientes';
+        mostrarAviso(erro.message);
+      }
+    })();
   </script>
 </body>
 </html>

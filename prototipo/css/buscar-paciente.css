@@ -6,17 +6,21 @@
 }
 
 .busca-linha {
-  display: flex;
-  gap: 10px;
+  position: relative;
 }
 
 .busca-linha input {
-  flex: 1;
+  padding-left: 40px;
 }
 
-.busca-linha .botao {
-  flex: none;
-  height: 42px;
+/* Lupa dentro do campo */
+.busca-icone {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  transform: translateY(-50%);
+  color: var(--texto-suave);
+  pointer-events: none;
 }
 
 /* Resultados */
@@ -56,6 +60,18 @@
   height: 36px;
   padding: 0 12px;
   font-size: 14px;
+}
+
+/* Lista com rolagem própria; o cabeçalho da tabela fica fixo no alto */
+.lista-pacientes {
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.lista-pacientes thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 /* Linhas da tabela de pacientes: clicáveis e selecionáveis */
