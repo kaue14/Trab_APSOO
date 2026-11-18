@@ -1,0 +1,40 @@
+/* Só no sistema (cicatrizar.exe): a tela ocupa a janela inteira do Windows.
+   A janela de verdade já tem barra de título, então a barra simulada do protótipo some.
+   O servidor carrega este arquivo pelo css/modo.css; aberto direto do arquivo, nada disto vale. */
+
+body {
+  display: block;
+  padding: 0;
+}
+
+.janela {
+  width: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.barra-titulo {
+  display: none;
+}
+
+.app,
+.login {
+  min-height: 100vh;
+}
+
+/* Janela maximizada: o formulário de acesso não se estica demais */
+.acesso {
+  padding-inline: max(48px, calc((100% - 460px) / 2));
+}
+
+/* Telas internas: o conteúdo fica com uma largura confortável, centralizado */
+.conteudo {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+}
+
+/* Buscar paciente: a lista aproveita a altura da janela */
+.lista-pacientes {
+  max-height: max(460px, calc(100vh - 320px));
+}

@@ -1,0 +1,3 @@
+/* Aberto direto do arquivo (protótipo), este arquivo não muda nada: a tela aparece dentro da janela simulada.
+   O servidor do sistema (cicatrizar.exe) responde este mesmo endereço com @import "sistema.css",
+   e a tela passa a ocupar a janela inteira. É o mesmo esquema do js/modo.js. */

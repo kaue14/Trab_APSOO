@@ -355,12 +355,20 @@ int main(int argc, char* argv[]) {
         res.set_redirect("/login.html");
     });
 
-    // As telas perguntam por js/modo.js: aberto pelo servidor, passam a usar a API em vez dos dados fictícios
+    // As telas perguntam por js/modo.js e css/modo.css: abertas pelo servidor, passam a usar a API em vez
+    // dos dados fictícios e ocupam a janela inteira, sem a barra de título simulada do protótipo
     servidor.set_pre_routing_handler([](const httplib::Request& req, httplib::Response& res) {
-        if (req.path != "/js/modo.js") return httplib::Server::HandlerResponse::Unhandled;
-        res.set_header("Cache-Control", "no-cache");
-        res.set_content("const MODO_API = true;\n", "text/javascript; charset=utf-8");
-        return httplib::Server::HandlerResponse::Handled;
+        if (req.path == "/js/modo.js") {
+            res.set_header("Cache-Control", "no-cache");
+            res.set_content("const MODO_API = true;\n", "text/javascript; charset=utf-8");
+            return httplib::Server::HandlerResponse::Handled;
+        }
+        if (req.path == "/css/modo.css") {
+            res.set_header("Cache-Control", "no-cache");
+            res.set_content("@import url(\"sistema.css\");\n", "text/css; charset=utf-8");
+            return httplib::Server::HandlerResponse::Handled;
+        }
+        return httplib::Server::HandlerResponse::Unhandled;
     });
 
     // O navegador sempre confere se as telas mudaram (sem isso, mostra versões antigas guardadas)
