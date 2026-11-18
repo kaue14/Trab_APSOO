@@ -1,0 +1,109 @@
+@startuml
+title Diagrama de Atividades - Cicatrizar System
+
+start
+
+:Exibir tela de login;
+:Informar login ou CPF e senha;
+:Validar credenciais;
+
+if (Credenciais válidas?) then (Sim)
+  :Identificar nível de acesso;
+  :Exibir tela principal;
+
+  while (Deseja continuar no sistema?) is (Sim)
+
+    :Selecionar funcionalidade;
+
+    if (Funcionalidade?) then (Buscar paciente)
+      :Informar nome ou identificação;
+      :Consultar pacientes cadastrados;
+      :Exibir resultados;
+
+    elseif (Registrar procedimento)
+      :Selecionar paciente;
+      :Informar procedimento, data e profissional;
+      :Validar dados;
+      :Salvar procedimento;
+
+    elseif (Registrar material)
+      :Selecionar paciente;
+      :Informar material, data e quantidade;
+      :Validar dados;
+      :Salvar registro de material;
+
+    elseif (Editar procedimento)
+      :Selecionar procedimento;
+      if (Pode editar o registro?) then (Sim)
+        :Alterar dados do procedimento;
+        :Validar e salvar alterações;
+      else (Não)
+        :Informar restrição de acesso;
+      endif
+
+    elseif (Cadastrar paciente)
+      if (Perfil é Enfermeiro ou Administrador?) then (Sim)
+        :Informar dados do paciente;
+        :Validar campos;
+        :Salvar cadastro do paciente;
+      else (Não)
+        :Informar restrição de acesso;
+      endif
+
+    elseif (Editar paciente)
+      if (Perfil é Enfermeiro ou Administrador?) then (Sim)
+        :Buscar e selecionar paciente;
+        :Alterar dados cadastrais;
+        :Validar e salvar alterações;
+      else (Não)
+        :Informar restrição de acesso;
+      endif
+
+    elseif (Fechamento mensal)
+      if (Perfil é Enfermeiro ou Administrador?) then (Sim)
+        :Selecionar paciente e mês/ano;
+        :Consolidar procedimentos e materiais;
+        :Exibir fechamento mensal;
+      else (Não)
+        :Informar restrição de acesso;
+      endif
+
+    elseif (Cadastrar usuário)
+      if (Perfil é Administrador?) then (Sim)
+        :Informar nome, COREN, login,\nsenha e nível de acesso;
+        :Validar dados;
+        :Proteger senha;
+        :Salvar usuário;
+      else (Não)
+        :Informar restrição de acesso;
+      endif
+
+    elseif (Consultar logs)
+      if (Perfil é Administrador?) then (Sim)
+        :Consultar histórico de ações;
+        :Exibir logs;
+      else (Não)
+        :Informar restrição de acesso;
+      endif
+
+    elseif (Configurar sistema)
+      if (Perfil é Administrador?) then (Sim)
+        :Alterar configurações;
+        :Salvar configurações;
+      else (Não)
+        :Informar restrição de acesso;
+      endif
+    endif
+
+  endwhile (Não)
+
+  :Encerrar sessão;
+  :Retornar à tela de login;
+
+else (Não)
+  :Exibir mensagem de erro;
+  :Solicitar novas credenciais;
+endif
+
+stop
+@enduml
