@@ -1,0 +1,62 @@
+@startuml
+left to right direction
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 40
+
+skinparam actor {
+  Margin 15
+}
+
+actor "Técnico de\nEnfermagem" as Tecnico
+actor "Enfermeiro" as Enfermeiro
+actor "Administrador" as Admin
+
+Enfermeiro --|> Tecnico
+Admin --|> Enfermeiro
+
+rectangle "Cicatrizar System" {
+
+  package "Acesso e usuários" {
+    usecase "RF001 - Autenticar usuário" as UC01
+    usecase "RF002 - Cadastrar usuário" as UC02
+    usecase "RF003 - Encerrar sessão" as UC03
+  }
+
+  package "Gerenciamento de pacientes" {
+    usecase "RF004 - Cadastrar paciente" as UC04
+    usecase "RF005 - Buscar paciente" as UC05
+    usecase "RF006 - Editar dados do paciente" as UC06
+  }
+
+  package "Atendimentos e materiais" {
+    usecase "RF007 - Registrar procedimento" as UC07
+    usecase "RF008 - Registrar material utilizado" as UC08
+    usecase "RF009 - Consultar fechamento mensal" as UC09
+    usecase "RF010 - Editar procedimento registrado" as UC10
+  }
+
+  package "Administração" {
+    usecase "RF011 - Consultar logs de atividades" as UC11
+    usecase "RF012 - Configurar sistema" as UC12
+  }
+}
+
+Tecnico --> UC01
+Tecnico --> UC03
+Tecnico --> UC05
+Tecnico --> UC07
+Tecnico --> UC08
+Tecnico --> UC10
+
+Enfermeiro --> UC04
+Enfermeiro --> UC06
+Enfermeiro --> UC09
+
+Admin --> UC02
+Admin --> UC11
+Admin --> UC12
+@enduml
